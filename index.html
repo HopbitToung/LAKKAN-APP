@@ -217,7 +217,7 @@ async function proposeExchange(myItemId,theirItem,topUp){ await guard(async()=>{
     aUid:S.user.uid,aName:S.profile.name,aItemId:myItemId,
     bUid:theirItem.ownerUid,bName:theirItem.ownerName,bItemId:theirItem.id,
     topUpAmount:(topUp&&topUp.amount)||0, topUpBy:(topUp&&topUp.by)||"",
-    state:"Proposed",aDeposited:false,bDeposited:false,aValidated:false,bValidated:false,aReceived:false,bReceived:false,rateA:0,rateB:0,
+    state:"Proposed",ts:Date.now(),aDeposited:false,bDeposited:false,aValidated:false,bValidated:false,aReceived:false,bReceived:false,rateA:0,rateB:0,
     history:[{t:"Proposed",by:S.profile.name,at:Date.now()}],createdAt:serverTimestamp() });
   S.view="exchanges"; render(); }); }
 async function setItemStatus(id,st){ await updateDoc(doc(db,"items",id),{status:st}); }
@@ -246,7 +246,7 @@ async function seedDemo(){ await guard(async()=>{
 
 /* ---------- QR + Scan + Hub-per-item + Rating ---------- */
 const qrText=(id)=>"LAKKAN:"+id;
-function qrInto(el,text,size){ size=size||104; el.innerHTML=""; try{ new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.textContent="(QR)"; } }
+function qrInto(el,text,size){ size=size||104; el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=0&data=${encodeURIComponent(text)}" width="${size}" height="${size}" style="display:block" alt="QR">`; }
 let scanStream=null;
 function stopScan(){ if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; } const o=document.getElementById("scanModal"); if(o)o.remove(); }
 async function startScan(onCode){
@@ -298,6 +298,8 @@ function showHubApprove(ex){
   const m=$(`<div id="scanModal" style="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px"></div>`);
   const card=$(`<div class="card" style="max-width:400px;width:100%;margin:0"><h2 class="title">ตรวจสอบคู่แลก (สแกนแล้ว)</h2><div class="sub">เทียบของจริงกับข้อมูลทั้งสองชิ้น แล้วอนุมัติ</div></div>`);
   [[ai,ex.aName],[bi,ex.bName]].forEach(([it,nm])=>{ card.appendChild($(`<div class="item" style="margin:8px 0"><div class="thumb">${it&&it.photo?`<img src="${it.photo}">`:(CATICON[it&&it.category]||"📦")}</div><div style="flex:1"><div class="t">${esc(it&&it.title||"?")}</div><div class="m">${esc(it&&it.category||"")} · ~${it&&it.estValue||0}฿ · ${esc(nm)}</div></div></div>`)); });
+  card.appendChild($(`<div class="okbox" style="text-align:left;margin-top:6px"><b>สรุปสำหรับการตรวจ (อัตโนมัติ)</b><br>• มูลค่ารวม 2 ชิ้น ~฿${(((ai&&ai.estValue)||0)+((bi&&bi.estValue)||0)).toLocaleString()}${ex.topUpAmount>0?` · เงินเติมส่วนต่าง ฿${ex.topUpAmount} (${ex.topUpBy==='a'?esc(ex.aName):esc(ex.bName)})`:""}<br>• เช็กลิสต์: ☐ ตรงกับรูป ☐ สภาพตามระบุ ☐ ของครบ ☐ ไม่ชำรุด/ปลอม</div>`));
+  if(AI_ON){ const aib=$(`<button class="btn ghost" style="margin-top:4px">✨ ให้ AI สรุปจุดตรวจจากรูป</button>`); const out=$(`<div class="small" style="white-space:pre-wrap;margin-top:6px"></div>`); aib.onclick=()=>aiInspect(ex,out); card.append(aib,out); }
   const ok=$(`<button class="btn green" style="margin-top:10px">✓ อนุมัติทั้งคู่ (รับเข้าฮับ + ตรวจผ่าน)</button>`); ok.onclick=()=>{ stopScan(); hubApprovePair(ex); };
   const cancel=$(`<button class="btn ghost" style="margin-top:8px">ปิด</button>`); cancel.onclick=stopScan;
   card.append(ok,cancel); m.appendChild(card); document.body.appendChild(m);
@@ -354,6 +356,16 @@ async function aiDescribeItem(dataUrl){
     return null;
   }
   return null;
+}
+async function aiInspect(ex,outEl){
+  outEl.textContent="⏳ AI กำลังวิเคราะห์รูป…";
+  const ai=S.items.find(x=>x.id===ex.aItemId),bi=S.items.find(x=>x.id===ex.bItemId);
+  const parts=[{text:`คุณเป็นเจ้าหน้าที่ฮับตรวจสอบสินค้าแลกเปลี่ยนมือสอง. ชิ้น A: ${ai&&ai.title} (${ai&&ai.category}, ประเมิน ${ai&&ai.estValue}฿, ${(ai&&ai.desc)||"-"}). ชิ้น B: ${bi&&bi.title} (${bi&&bi.category}, ประเมิน ${bi&&bi.estValue}฿, ${(bi&&bi.desc)||"-"}). ช่วยสรุป "จุดที่ต้องตรวจ" ของแต่ละชิ้นเป็นเช็กลิสต์สั้นๆ ภาษาไทย และเตือนถ้ามูลค่าห่างกันผิดปกติหรือของดูไม่ตรงคำอธิบาย`}];
+  if(ai&&ai.photo) parts.push({inline_data:{mime_type:"image/jpeg",data:ai.photo.split(",")[1]}});
+  if(bi&&bi.photo) parts.push({inline_data:{mime_type:"image/jpeg",data:bi.photo.split(",")[1]}});
+  try{ const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":GEMINI_API_KEY},body:JSON.stringify({contents:[{parts}]})});
+    const j=await r.json(); outEl.textContent = r.ok?((j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts[0].text)||"—"):("AI error: "+((j&&j.error&&j.error.message)||r.status)); }
+  catch(e){ outEl.textContent="AI error: "+e.message; }
 }
 
 /* ============================ RENDER ============================ */
@@ -552,7 +564,7 @@ function stateFlow(cur){ const idx=STATES.indexOf(cur);
   return `<div class="state-flow">${STATES.map((s,k)=>`<span class="${k<idx?'done':k===idx?'cur':''}">${STATE_TH[s]}</span>`).join("")}${cur==="Returned"?'<span class="cur" style="background:var(--red)">ตีกลับ</span>':''}</div>`; }
 function exchangesView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">การแลกของฉัน</h2><div class="sub">ทั้งที่ฉันเสนอและมีคนเสนอมา</div>`));
-  const mine=S.exchanges.filter(e=>e.aUid===S.user.uid||e.bUid===S.user.uid);
+  const mine=S.exchanges.filter(e=>e.aUid===S.user.uid||e.bUid===S.user.uid).sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(!mine.length) w.appendChild($(`<div class="hint">ยังไม่มีรายการแลก ไปที่ "หน้าแรก" เพื่อเสนอแลก</div>`));
   mine.forEach(e=>{ const ai=S.items.find(x=>x.id===e.aItemId),bi=S.items.find(x=>x.id===e.bItemId);
     const c=$(`<div class="card"><div class="row"><div style="flex:1"><b>${esc(ai?.title||"?")}</b> <span class="small">↔</span> <b>${esc(bi?.title||"?")}</b></div>
@@ -591,18 +603,21 @@ function exDetailView(){
     const qc=$(`<div class="card" style="text-align:center"><label>QR คู่แลก — ติดได้ทั้งสองพัสดุ (ฮับสแกน 1 ครั้ง เห็นทั้งคู่)</label><div class="qrbox" style="width:150px;height:150px;margin:12px auto"></div><div class="small">รหัสคู่: EX:${esc(e.id)}</div></div>`);
     qrInto(qc.querySelector(".qrbox"),"LAKKAN:EX:"+e.id,140); w.appendChild(qc);
   }
-  // ให้คะแนนเมื่อสำเร็จ
+  // ให้คะแนนเมื่อสำเร็จ (สองฝั่ง)
   if(e.state==="Completed" && (isA||isB)){
-    const mySide=isA?"rateA":"rateB";
-    const rc=$(`<div class="card"><label>ให้คะแนนการแลกนี้</label></div>`);
-    if(e[mySide]>0){ rc.appendChild($(`<div><div style="font-size:20px;margin-top:6px">${"⭐".repeat(e[mySide])}</div><div class="small">คุณให้คะแนนแล้ว</div></div>`)); }
+    const mySide=isA?"rateA":"rateB", theirSide=isA?"rateB":"rateA", other=isA?e.bName:e.aName;
+    const rc=$(`<div class="card"><label>⭐ ให้คะแนนคู่แลก</label></div>`);
+    if(e[mySide]>0){ rc.appendChild($(`<div style="margin-top:6px"><div style="font-size:20px">${"⭐".repeat(e[mySide])}</div><div class="small">คุณให้คะแนนแล้ว${e[mySide+"Comment"]?" — “"+esc(e[mySide+"Comment"])+"”":""}</div></div>`)); }
     else {
-      const stars=$(`<div style="font-size:30px;margin-top:8px;letter-spacing:6px;cursor:pointer"></div>`); let sel=0;
+      rc.appendChild($(`<div class="small" style="margin-top:4px">ให้คะแนน ${esc(other)}:</div>`));
+      const stars=$(`<div style="font-size:32px;margin-top:6px;letter-spacing:6px;cursor:pointer"></div>`); let sel=0;
       for(let n=1;n<=5;n++){ const s=$(`<span>☆</span>`); s.onclick=()=>{ sel=n; [...stars.children].forEach((c,idx)=>c.textContent=idx<sel?"★":"☆"); }; stars.appendChild(s); }
       rc.appendChild(stars);
       const cm=$(`<input placeholder="ความเห็น (ไม่บังคับ)" style="margin-top:8px">`); rc.appendChild(cm);
       const sb=$(`<button class="btn pink" style="margin-top:10px">ส่งคะแนน</button>`); sb.onclick=()=>{ if(!sel)return alert("แตะดาวเพื่อให้คะแนนก่อน"); rateExchange(e,mySide,sel,cm.value.trim()); }; rc.appendChild(sb);
     }
+    if(e[theirSide]>0){ rc.appendChild($(`<div><div style="height:1px;background:var(--line);margin:10px 0"></div><div class="small">${esc(other)} ให้คุณ: <span style="font-size:15px">${"⭐".repeat(e[theirSide])}</span>${e[theirSide+"Comment"]?" — “"+esc(e[theirSide+"Comment"])+"”":""}</div></div>`)); }
+    else { rc.appendChild($(`<div class="small" style="margin-top:8px;color:var(--muted)">รอ ${esc(other)} ให้คะแนน</div>`)); }
     w.appendChild(rc);
   }
   const h=$(`<div class="card"><label>ประวัติสถานะ</label></div>`);
@@ -663,7 +678,7 @@ function profileView(){
 function hubView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">🏭 โมดูลฮับ</h2><div class="sub">ตรวจสอบ · ล็อกไขว้ · จัดส่ง</div>`));
   w.appendChild($(`<div class="warnbox">โหมดสาธิต: ทุกบัญชีเข้าฮับได้ · ระบบจริงจะจำกัดเฉพาะพนักงานฮับ</div>`));
-  const q=S.exchanges.filter(e=>["Deposited","AtHub","Validated","Locked"].includes(e.state));
+  const q=S.exchanges.filter(e=>["Deposited","AtHub","Validated","Locked"].includes(e.state)).sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(!q.length) w.appendChild($(`<div class="hint">ยังไม่มีรายการรอที่ฮับ (ต้องผ่านขั้น "วางมัดจำ" ทั้งสองฝ่ายก่อน)</div>`));
   q.forEach(e=>{ const ai=S.items.find(x=>x.id===e.aItemId),bi=S.items.find(x=>x.id===e.bItemId);
     const c=$(`<div class="card"><div class="row"><div style="flex:1"><b>${esc(ai?.title||"?")}</b> ↔ <b>${esc(bi?.title||"?")}</b></div><span class="pill p-blue">${STATE_TH[e.state]}</span></div>${stateFlow(e.state)}</div>`);
@@ -688,7 +703,7 @@ function adminView(){
   w.appendChild(k);
   const seed=$(`<button class="btn ghost" style="margin:10px 0">🧪 สร้างรายการตัวอย่าง 4 ชิ้น (บัญชีนี้)</button>`); seed.onclick=seedDemo; w.appendChild(seed);
   const t=$(`<div class="card"><label>การแลกล่าสุด</label><table class="tbl"><tr><th>คู่แลก</th><th>สถานะ</th></tr>
-    ${S.exchanges.slice(-8).reverse().map(e=>`<tr><td>${esc((S.items.find(x=>x.id===e.aItemId)||{}).title||"?")} ↔ ${esc((S.items.find(x=>x.id===e.bItemId)||{}).title||"?")}</td><td>${STATE_TH[e.state]}</td></tr>`).join("")||`<tr><td colspan=2 class="small">ยังไม่มีข้อมูล</td></tr>`}</table></div>`);
+    ${S.exchanges.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,8).map(e=>`<tr><td>${esc((S.items.find(x=>x.id===e.aItemId)||{}).title||"?")} ↔ ${esc((S.items.find(x=>x.id===e.bItemId)||{}).title||"?")}</td><td>${STATE_TH[e.state]}</td></tr>`).join("")||`<tr><td colspan=2 class="small">ยังไม่มีข้อมูล</td></tr>`}</table></div>`);
   w.appendChild(t); return w;
 }
 function financeView(){
