@@ -96,6 +96,19 @@ label{font-size:12.5px;font-weight:700;color:var(--slate);}
 .pcard .pr{color:var(--pink-d);font-weight:800;font-size:14px;margin-top:3px;}
 .pcard .ct{font-size:10.5px;color:var(--muted);margin-top:1px;}
 .pcard.locked{background:#FFF9E6;border-color:#F0D264;}
+.hrow{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;}
+.hrow::-webkit-scrollbar{height:5px;}.hrow::-webkit-scrollbar-thumb{background:#d3dbe4;border-radius:5px;}
+.mcard{flex:0 0 130px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;}
+.mcard:active{transform:scale(.97);}
+.mcard .mi{position:relative;width:100%;height:98px;background:linear-gradient(135deg,var(--cream),#e9f2ff);display:flex;align-items:center;justify-content:center;font-size:34px;overflow:hidden;}
+.mcard .mi img{width:100%;height:100%;object-fit:cover;}
+.mcard .av2{position:absolute;left:6px;bottom:6px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#eaf0f6;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.mcard .av2 img{width:100%;height:100%;object-fit:cover;}
+.mcard .minfo{padding:7px 8px;}
+.mcard .mt{font-weight:700;font-size:12px;line-height:1.2;height:29px;overflow:hidden;}
+.mcard .mp{color:var(--pink-d);font-weight:800;font-size:12.5px;margin-top:2px;}
+.mcard .md{font-size:9.5px;margin-top:2px;color:var(--muted);line-height:1.3;}
+.myitem-head{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
 .up{border:2px dashed var(--line);border-radius:13px;padding:16px;text-align:center;cursor:pointer;background:#fbfcfe;margin-top:6px;}
 .up img{max-width:100%;border-radius:10px;max-height:150px;}
 .up .ph{font-size:30px;}
@@ -213,6 +226,8 @@ async function addItem(d){ await guard(async()=>{
   await addDoc(collection(db,"items"),{...d,ownerUid:S.user.uid,ownerName:S.profile.name,status:"available",createdAt:serverTimestamp()});
   S.view="myitems"; render(); }); }
 async function proposeExchange(myItemId,theirItem,topUp){ await guard(async()=>{
+  const mineIt=S.items.find(x=>x.id===myItemId);
+  if((mineIt&&mineIt.status!=="available")||theirItem.status!=="available"){ alert("ของชิ้นนี้ถูกจับคู่ไปแล้ว เลือกชิ้นอื่น"); return; }
   await addDoc(collection(db,"exchanges"),{
     aUid:S.user.uid,aName:S.profile.name,aItemId:myItemId,
     bUid:theirItem.ownerUid,bName:theirItem.ownerName,bItemId:theirItem.id,
@@ -223,8 +238,12 @@ async function proposeExchange(myItemId,theirItem,topUp){ await guard(async()=>{
 async function setItemStatus(id,st){ await updateDoc(doc(db,"items",id),{status:st}); }
 async function exUpdate(ex,patch,note){
   await updateDoc(doc(db,"exchanges",ex.id),{...patch, history:arrayUnion({t:note||patch.state||"update",by:S.profile.name,at:Date.now()})}); }
-async function acceptEx(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Accepted"},"Accepted");
+async function acceptEx(ex){ await guard(async()=>{
+  const a=S.items.find(x=>x.id===ex.aItemId), b=S.items.find(x=>x.id===ex.bItemId);
+  if((a&&a.status!=="available")||(b&&b.status!=="available")){ await exUpdate(ex,{state:"Returned"},"ยกเลิก: ของถูกจับคู่ไปแล้ว"); S.sel=ex.id; S.view="exDetail"; render(); alert("ขออภัย ของชิ้นนี้ถูกจับคู่กับรายการอื่นไปแล้ว รายการนี้จึงถูกยกเลิก"); return; }
+  await exUpdate(ex,{state:"Accepted"},"Accepted");
   await setItemStatus(ex.aItemId,"locked"); await setItemStatus(ex.bItemId,"locked");
+  for(const o of S.exchanges){ if(o.id!==ex.id && o.state==="Proposed" && (o.aItemId===ex.aItemId||o.bItemId===ex.aItemId||o.aItemId===ex.bItemId||o.bItemId===ex.bItemId)){ await exUpdate(o,{state:"Returned"},"ยกเลิกอัตโนมัติ (ของถูกจับคู่แล้ว)"); } }
   S.sel=ex.id; S.view="exDetail"; render(); alert("ยอมรับการแลกแล้ว ✓ — กด 'จำลองวางมัดจำ' เพื่อดำเนินการต่อ"); }); }
 async function declineEx(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Returned"},"ปฏิเสธ"); }); }
 async function deposit(ex){ await guard(async()=>{ const mine=ex.aUid===S.user.uid?"aDeposited":"bDeposited";
@@ -285,6 +304,7 @@ async function hubValidateItem(raw){
   });
 }
 async function hubReject(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Returned"},"ตรวจไม่ผ่าน ตีกลับ"); await setItemStatus(ex.aItemId,"available"); await setItemStatus(ex.bItemId,"available"); }); }
+async function cancelEx(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Returned"},"ยกเลิกโดยผู้ใช้"); if(ex.aItemId) await setItemStatus(ex.aItemId,"available"); if(ex.bItemId) await setItemStatus(ex.bItemId,"available"); }); }
 function hubHandleScan(raw){
   const s=(raw||"").trim(); let exId="";
   if(s.indexOf("LAKKAN:EX:")===0) exId=s.slice(10);
@@ -597,6 +617,7 @@ function exDetailView(){
   if(["Deposited","AtHub","Validated","Locked"].includes(e.state)){ act.appendChild($(`<div class="small">อยู่ระหว่างดำเนินการที่ฮับ — ติดตามในโมดูล 🏭 ฮับ</div>`)); has=true; }
   if(e.state==="Completed"){ act.appendChild($(`<span class="pill p-ok">แลกสำเร็จ 🎉</span>`)); has=true; }
   if(e.state==="Returned"){ act.appendChild($(`<span class="pill p-warn">รายการถูกตีกลับ/ยกเลิก</span>`)); has=true; }
+  if(["Proposed","Accepted"].includes(e.state)){ const cb=$(`<button class="btn red sm" style="margin-top:8px;width:100%">ยกเลิกรายการนี้</button>`); cb.onclick=()=>{ if(confirm("ยกเลิกรายการแลกนี้? ของจะกลับมาว่างให้แลกใหม่")) cancelEx(e); }; act.appendChild(cb); has=true; }
   if(has) w.appendChild(act);
   // QR คู่แลก 1 โค้ด (ติดได้ทั้งสองพัสดุ) — ฮับสแกนครั้งเดียวเห็นทั้งคู่
   if(["Proposed","Accepted","Deposited","AtHub","Validated","Locked"].includes(e.state)){
@@ -631,29 +652,33 @@ function smartMatches(){
 }
 function aiView(){
   const w=$(`<div></div>`); const back=$(`<div class="link" style="margin-bottom:8px">‹ กลับ</div>`); back.onclick=()=>{S.view="feed";render();}; w.appendChild(back);
-  w.appendChild($(`<h2 class="title">✨ จับคู่อัจฉริยะ</h2><div class="sub">เทียบราคา · คิดส่วนต่าง · ถ้าไม่พอดี เติมเงินส่วนต่างเพื่อให้แลกได้เลย</div>`));
+  w.appendChild($(`<h2 class="title">✨ จับคู่แลก</h2><div class="sub">เลือกของคุณ 1 ชิ้น เลื่อนดูของที่แลกได้ทางขวา → แตะเพื่อเสนอแลก</div>`));
   if(!verified()){ const g=$(`<div class="hint">ยืนยันตัวตนก่อนจึงจะเสนอแลกได้</div>`); w.appendChild(g);
     const b=$(`<button class="btn pink">ยืนยันตัวตน</button>`); b.onclick=()=>{S.view="kyc";render();}; w.appendChild(b); return w; }
   const mine=myItems().filter(i=>i.status==="available");
   if(!mine.length){ w.appendChild($(`<div class="hint">ลงของของคุณก่อน ระบบจึงจับคู่ให้ได้ (ไปที่ "ลงของ")</div>`)); return w; }
-  const pairs=smartMatches();
-  if(!pairs.length){ w.appendChild($(`<div class="hint">ยังไม่มีของจากคนอื่นให้จับคู่ — ชวนเพื่อนลงของ หรือกด "สร้างรายการตัวอย่าง" ในโมดูลแอดมิน</div>`)); return w; }
-  // optional Gemini negotiation advice
-  const aiBox=$(`<div class="card ai"></div>`);
-  if(S.aiLoading) aiBox.appendChild($(`<div class="spin"></div><div class="small" style="text-align:center">AI กำลังวิเคราะห์…</div>`));
-  else if(S.ai) aiBox.appendChild($(`<div style="font-size:13.5px;white-space:pre-wrap;line-height:1.6">${esc(S.ai)}</div>`));
-  else aiBox.appendChild($(`<div class="small">อยากได้คำแนะนำการต่อรองแบบภาษาคน? กดปุ่มด้านล่าง (ไม่บังคับ)</div>`));
-  const aib=$(`<button class="btn blue sm" style="margin-top:8px">${AI_ON?'💬 ให้ AI แนะนำการต่อรอง':'AI (ยังไม่ตั้งค่าคีย์)'}</button>`); aib.onclick=aiMatch; aiBox.appendChild(aib);
+  const others=availOthers();
+  if(!others.length){ w.appendChild($(`<div class="hint">ยังไม่มีของจากคนอื่นให้จับคู่ — ชวนเพื่อนลงของ หรือกด "สร้างรายการตัวอย่าง" ในโมดูลแอดมิน</div>`)); return w; }
+  const aiBox=$(`<div class="card ai" style="padding:12px"></div>`);
+  if(S.aiLoading) aiBox.appendChild($(`<div class="spin"></div>`));
+  else if(S.ai) aiBox.appendChild($(`<div style="font-size:13px;white-space:pre-wrap;line-height:1.55">${esc(S.ai)}</div>`));
+  const aib=$(`<button class="btn blue sm" style="margin-top:${(S.ai||S.aiLoading)?'8px':'0'}">${AI_ON?'💬 ให้ AI แนะนำการต่อรอง':'AI (ยังไม่ตั้งค่าคีย์)'}</button>`); aib.onclick=aiMatch; aiBox.appendChild(aib);
   w.appendChild(aiBox);
-  w.appendChild($(`<div class="small" style="margin:2px 0 8px">คู่ที่เข้ากันมากสุด (เรียงตามส่วนต่างน้อยสุด):</div>`));
-  pairs.forEach(p=>{ const diff=p.diff; const tu=diff>0?{amount:diff,by:'a'}:diff<0?{amount:-diff,by:'b'}:null;
-    const msg = diff===0?`<span class="pill p-ok">มูลค่าใกล้เคียง แลกได้เลย</span>`
-      : diff>0?`<span class="pill p-warn">ของเขาแพงกว่า ฿${diff}</span> &nbsp;<span class="small">→ คุณเติมเงิน ฿${diff}</span>`
-      : `<span class="pill p-warn">ของคุณแพงกว่า ฿${-diff}</span> &nbsp;<span class="small">→ อีกฝ่ายเติม ฿${-diff}</span>`;
-    const c=$(`<div class="card"><div class="row"><div style="flex:1"><b>${esc(p.m.title)}</b><div class="small">ของคุณ · ~${p.m.estValue}฿</div></div><div style="font-size:18px">🔄</div><div style="flex:1;text-align:right"><b>${esc(p.o.title)}</b><div class="small">${esc(p.o.ownerName)} · ~${p.o.estValue}฿</div></div></div>
-      <div style="margin:9px 0 4px">${msg}</div></div>`);
-    const go=$(`<button class="btn pink sm" style="width:100%">เสนอแลก${tu?` + เติม ฿${tu.amount}`:''}</button>`); go.onclick=()=>proposeExchange(p.m.id,p.o,tu); c.appendChild(go);
-    w.appendChild(c); });
+  mine.forEach(m=>{
+    const sec=$(`<div class="card"></div>`);
+    sec.appendChild($(`<div class="myitem-head"><div class="thumb" style="width:46px;height:46px;font-size:22px">${m.photo?`<img src="${m.photo}">`:(CATICON[m.category]||"📦")}</div><div style="flex:1"><div class="t">${esc(m.title)}</div><div class="small">ของคุณ · ~฿${(m.estValue||0).toLocaleString()} · เลื่อนดูของที่แลกได้ →</div></div></div>`));
+    const cands=others.map(o=>({o,diff:(o.estValue||0)-(m.estValue||0)})).sort((a,b)=>Math.abs(a.diff)-Math.abs(b.diff));
+    const row=$(`<div class="hrow"></div>`);
+    cands.forEach(({o,diff})=>{
+      const tu=diff>0?{amount:diff,by:'a'}:diff<0?{amount:-diff,by:'b'}:null;
+      const ow=S.users[o.ownerUid]||{}; const av=ow.kyc&&ow.kyc.selfie;
+      const dtxt=diff===0?`<span style="color:var(--green);font-weight:700">แลกได้พอดี</span>`:(diff>0?`<span style="color:var(--amber);font-weight:700">เติม ฿${diff}</span>`:`<span style="color:var(--green);font-weight:700">รับ ฿${-diff}</span>`);
+      const mc=$(`<div class="mcard"><div class="mi">${o.photo?`<img src="${o.photo}">`:(CATICON[o.category]||"📦")}<div class="av2">${av?`<img src="${av}">`:"👤"}</div></div><div class="minfo"><div class="mt">${esc(o.title)}</div><div class="mp">~฿${(o.estValue||0).toLocaleString()}</div><div class="md">${dtxt}<br>${esc((o.ownerName||"").split(" ")[0])}</div></div></div>`);
+      mc.onclick=()=>{ if(confirm(`เสนอแลก "${m.title}" กับ "${o.title}"?`+(tu?`\n${tu.by==='a'?'คุณเติม':'อีกฝ่ายเติม'} ฿${tu.amount}`:''))) proposeExchange(m.id,o,tu); };
+      row.appendChild(mc);
+    });
+    sec.appendChild(row); w.appendChild(sec);
+  });
   return w;
 }
 function profileView(){
