@@ -2,80 +2,92 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>LAKKAN · แลกกัน</title>
 <style>
 :root{
-  --pink:#F0509E; --pink-d:#D83A87; --blue:#2D8CF0; --cream:#FFF0F7; --navy:#102A43;
-  --ink:#1B2B3A; --slate:#41556B; --muted:#8497AB; --line:#E7ECF2; --bg:#F5F7FA;
+  --pink:#F0509E; --pink-d:#D83A87; --pink-l:#FFE3F1; --blue:#2D8CF0; --blue-d:#1E6FD0;
+  --cream:#FFF0F7; --navy:#102A43; --navy-2:#1B3A5B;
+  --ink:#1B2B3A; --slate:#41556B; --muted:#8497AB; --line:#EAEEF3; --bg:#F4F6F9;
   --green:#16A34A; --amber:#B7791F; --red:#DC2626; --white:#fff; --tGreen:#E9F8EF; --tAmber:#FFF6E5;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:"Sarabun","Leelawadee UI","Segoe UI",Tahoma,sans-serif;background:#dfe4ea;color:var(--ink);}
-#app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.12);}
-.topbar{background:var(--navy);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;}
-.topbar .logo{font-weight:800;font-size:19px;letter-spacing:.5px;}
+body{font-family:"Sarabun","Leelawadee UI","Segoe UI",Tahoma,sans-serif;background:#c9d3de;color:var(--ink);}
+#app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column;box-shadow:0 0 50px rgba(0,0,0,.18);}
+.topbar{background:linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;padding:15px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;}
+.topbar .logo{font-weight:800;font-size:20px;letter-spacing:.3px;}
 .topbar .logo b{color:var(--pink);}
 .topbar .sp{flex:1;}
-.topbar .who{font-size:12px;opacity:.85;}
-.modstrip{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:#0b2030;position:sticky;top:52px;z-index:19;}
+.topbar .who{font-size:12px;opacity:.9;display:flex;align-items:center;gap:4px;}
+.vbadge{background:var(--green);color:#fff;font-size:9px;font-weight:800;border-radius:20px;padding:1px 7px;}
+.modstrip{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:#0b2030;position:sticky;top:53px;z-index:19;}
 .modstrip::-webkit-scrollbar{display:none;}
-.mpill{white-space:nowrap;border:none;background:#17324a;color:#cbd6e2;padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+.mpill{white-space:nowrap;border:none;background:#17324a;color:#cbd6e2;padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
 .mpill.on{background:var(--pink);color:#fff;}
-.body{flex:1;padding:14px 14px 90px;overflow-y:auto;}
-h2.title{font-size:20px;font-weight:800;color:var(--navy);margin:4px 0 2px;}
-.sub{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(16,42,67,.04);}
+.body{flex:1;padding:16px 15px 92px;overflow-y:auto;}
+h2.title{font-size:21px;font-weight:800;color:var(--navy);margin:2px 0 2px;}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:13px;box-shadow:0 2px 8px rgba(16,42,67,.05);}
 .row{display:flex;gap:10px;align-items:center;}
-.btn{display:inline-block;border:none;border-radius:11px;padding:12px 16px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;text-align:center;}
-.btn.pink{background:var(--pink);color:#fff;} .btn.pink:active{background:var(--pink-d);}
-.btn.blue{background:var(--blue);color:#fff;}
+.btn{display:inline-block;border:none;border-radius:12px;padding:13px 16px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;text-align:center;transition:.15s;}
+.btn.pink{background:var(--pink);color:#fff;box-shadow:0 4px 12px rgba(240,80,158,.3);} .btn.pink:active{background:var(--pink-d);}
+.btn.blue{background:var(--blue);color:#fff;} .btn.blue:active{background:var(--blue-d);}
 .btn.navy{background:var(--navy);color:#fff;}
 .btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--line);}
 .btn.green{background:var(--green);color:#fff;}
 .btn.red{background:#fff;color:var(--red);border:1.5px solid #f3c2c2;}
-.btn.sm{width:auto;padding:8px 13px;font-size:13px;border-radius:9px;}
-.btn:disabled{opacity:.5;}
-input,textarea,select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14.5px;font-family:inherit;background:#fff;margin-top:6px;color:var(--ink);}
+.btn.sm{width:auto;padding:9px 14px;font-size:13px;border-radius:10px;}
+.btn:disabled{opacity:.45;box-shadow:none;}
+input,textarea,select{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:12px 13px;font-size:14.5px;font-family:inherit;background:#fbfcfe;margin-top:6px;color:var(--ink);}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink);background:#fff;}
 label{font-size:12.5px;font-weight:700;color:var(--slate);}
-.field{margin-bottom:11px;}
-.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;}
+.field{margin-bottom:12px;}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:700;}
 .p-av{background:var(--cream);color:var(--pink-d);}
 .p-warn{background:var(--tAmber);color:var(--amber);}
 .p-ok{background:var(--tGreen);color:var(--green);}
 .p-blue{background:#EAF2FD;color:var(--blue);}
 .item{display:flex;gap:12px;align-items:center;}
-.thumb{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--cream),#e9f2ff);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.thumb{width:58px;height:58px;border-radius:14px;background:linear-gradient(135deg,var(--cream),#e9f2ff);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden;}
+.thumb img{width:100%;height:100%;object-fit:cover;}
 .item .t{font-weight:700;font-size:14.5px;color:var(--ink);}
 .item .m{font-size:12px;color:var(--muted);}
-.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20;}
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20;box-shadow:0 -4px 16px rgba(0,0,0,.05);}
 .bottomnav button{flex:1;border:none;background:none;padding:9px 0 11px;font-family:inherit;font-size:10.5px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.bottomnav button .ic{font-size:20px;}
+.bottomnav button .ic{font-size:21px;}
 .bottomnav button.on{color:var(--pink);font-weight:700;}
-.center{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center;}
-.splash-logo{font-size:40px;font-weight:800;color:var(--navy);}
+.center{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;}
+.splash-logo{font-size:44px;font-weight:800;color:var(--navy);letter-spacing:-.5px;}
 .splash-logo b{color:var(--pink);}
-.tag{font-size:13px;color:var(--slate);margin:6px 0 26px;}
-.hint{background:#fff8fb;border:1px dashed var(--pink);border-radius:12px;padding:11px 13px;font-size:12.5px;color:var(--pink-d);margin-bottom:12px;}
+.tag{font-size:13px;color:var(--slate);margin:8px 0 28px;}
+.hint{background:#fff8fb;border:1px dashed var(--pink);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--pink-d);margin-bottom:12px;}
 .warnbox{background:var(--tAmber);border-left:4px solid var(--amber);border-radius:10px;padding:11px 13px;font-size:12.5px;color:#7a5712;margin-bottom:12px;}
-.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.kpi .k{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;}
-.kpi .k .n{font-size:23px;font-weight:800;color:var(--navy);}
-.kpi .k .l{font-size:11.5px;color:var(--muted);}
-.state-flow{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;}
-.state-flow span{font-size:10.5px;padding:3px 8px;border-radius:8px;background:#eef2f7;color:var(--muted);}
+.okbox{background:var(--tGreen);border-left:4px solid var(--green);border-radius:10px;padding:11px 13px;font-size:12.5px;color:#15803d;margin-bottom:12px;}
+.kyc-banner{background:linear-gradient(120deg,#fff,var(--cream));border:1px solid var(--pink-l);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;gap:12px;align-items:center;}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.kpi .k{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;box-shadow:0 2px 6px rgba(16,42,67,.04);}
+.kpi .k .n{font-size:24px;font-weight:800;color:var(--navy);}
+.kpi .k .l{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.state-flow{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0 2px;}
+.state-flow span{font-size:10px;padding:3px 8px;border-radius:8px;background:#eef2f7;color:var(--muted);}
 .state-flow span.done{background:var(--tGreen);color:var(--green);}
 .state-flow span.cur{background:var(--pink);color:#fff;}
 .tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
 .tbl th,.tbl td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;}
 .tbl th{color:var(--muted);font-weight:700;}
-.divider{height:1px;background:var(--line);margin:10px 0;}
 .link{color:var(--blue);font-weight:700;cursor:pointer;font-size:13px;}
 .err{color:var(--red);font-size:12.5px;margin-top:6px;}
 .ai{background:linear-gradient(135deg,#fff,#f4f9ff);border:1px solid #d8e6f5;}
 .spin{border:3px solid #eee;border-top:3px solid var(--pink);border-radius:50%;width:26px;height:26px;animation:s 1s linear infinite;margin:10px auto;}
 @keyframes s{to{transform:rotate(360deg);}}
 .small{font-size:11.5px;color:var(--muted);}
+.up{border:2px dashed var(--line);border-radius:13px;padding:16px;text-align:center;cursor:pointer;background:#fbfcfe;margin-top:6px;}
+.up img{max-width:100%;border-radius:10px;max-height:150px;}
+.up .ph{font-size:30px;}
+.seg{display:flex;background:#eef2f7;border-radius:12px;padding:3px;margin-bottom:14px;}
+.seg button{flex:1;border:none;background:none;padding:9px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;}
+.seg button.on{background:#fff;color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.stat-chip{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate);}
 </style>
 </head>
 <body>
@@ -83,47 +95,46 @@ label{font-size:12.5px;font-weight:700;color:var(--slate);}
 
 <script type="module">
 /* ============================================================
-   LAKKAN · แลกกัน — Firebase web app (Pilot)
-   ------------------------------------------------------------
-   >>> ตั้งค่า 2 จุดนี้ก่อนใช้งาน (ดูไฟล์ README-ตั้งค่า.md) <<<
+   LAKKAN · แลกกัน — Firebase web app (Pilot) · v2
+   >>> ตั้งค่า firebaseConfig และ GEMINI_API_KEY ด้านล่าง <<<
    ============================================================ */
 const firebaseConfig = {
-    apiKey: "AIzaSyD1qeNjFrU-zGvvij9OyDDHgLzu-WoI1g4",
+  apiKey: "AIzaSyD1qeNjFrU-zGvvij9OyDDHgLzu-WoI1g4",
   authDomain: "lakkan-pilot.firebaseapp.com",
   projectId: "lakkan-pilot",
   storageBucket: "lakkan-pilot.firebasestorage.app",
   messagingSenderId: "969305561801",
-  appId: "1:969305561801:web:6752e19db3ec9c3e6a4b18",
-  measurementId: "G-XWT1J97QS9"
+  appId: "1:969305561801:web:6752e19db3ec9c3e6a4b18"
 };
-const GEMINI_API_KEY = "AQ.Ab8RN6IdVXYFkQBX5fJTyQJSZd3j_z6tPx1U1EdHzM3xmA9RAw"; // จาก Google AI Studio (aistudio.google.com)
+const GEMINI_API_KEY = "PASTE_GEMINI_API_KEY";
 /* ============================================================ */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
   signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, addDoc, getDoc, getDocs, updateDoc,
-  onSnapshot, query, where, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, addDoc, getDoc, updateDoc,
+  onSnapshot, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const CONFIGURED = !firebaseConfig.apiKey.startsWith(firebaseConfig);
+const CONFIGURED = !firebaseConfig.apiKey.startsWith("PASTE");
+const AI_ON = !GEMINI_API_KEY.startsWith("PASTE");
 let auth, db;
 if (CONFIGURED){ const fb=initializeApp(firebaseConfig); auth=getAuth(fb); db=getFirestore(fb); }
 
-/* ---------- state ---------- */
 const S = { user:null, profile:null, role:"member", view:"feed",
-  items:[], exchanges:[], users:{}, sel:null, ai:null, aiLoading:false, err:"" };
+  items:[], exchanges:[], users:{}, sel:null, ai:null, aiLoading:false, err:"", kycTmp:{} };
 const CATS = ["เสื้อผ้า","รองเท้า","หนังสือ","ของสะสม","ของเล่น","อิเล็กทรอนิกส์","ของแต่งบ้าน","อื่นๆ"];
 const CATICON = {"เสื้อผ้า":"👕","รองเท้า":"👟","หนังสือ":"📚","ของสะสม":"🏺","ของเล่น":"🧸","อิเล็กทรอนิกส์":"📱","ของแต่งบ้าน":"🖼️","อื่นๆ":"📦"};
-const ROYALTY=3, DEPOSIT=100; // mock
+const ROYALTY=3, DEPOSIT=100;
 const STATES=["Proposed","Accepted","Deposited","AtHub","Validated","Locked","Shipping","Completed"];
 const STATE_TH={Proposed:"เสนอแลก",Accepted:"ยอมรับแล้ว",Deposited:"วางมัดจำแล้ว",AtHub:"ถึงฮับ",Validated:"ตรวจผ่าน",Locked:"ล็อกไขว้",Shipping:"กำลังจัดส่ง",Completed:"สำเร็จ",Returned:"ตีกลับ"};
 
 const $ = (h)=>{const d=document.createElement("div");d.innerHTML=h;return d.firstElementChild;};
 const app = document.getElementById("app");
-const esc = (s)=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const U = (uid)=>S.users[uid]||{name:"ผู้ใช้"};
+const esc = (s)=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const myItems = ()=>S.items.filter(i=>i.ownerUid===S.user.uid);
 const availOthers = ()=>S.items.filter(i=>i.ownerUid!==S.user.uid && i.status==="available");
+const verified = ()=>S.profile?.kyc?.status==="verified";
+async function guard(fn){ try{ await fn(); }catch(e){ console.error(e); alert("เกิดข้อผิดพลาด: "+(e.code||e.message||e)); } }
 
 /* ---------- boot ---------- */
 if(!CONFIGURED){ renderSetupNeeded(); }
@@ -133,104 +144,106 @@ else {
     else { S.user=null; render(); }
   });
 }
-
 function renderSetupNeeded(){
   app.innerHTML="";
-  app.appendChild($(`<div class="center">
-    <div class="splash-logo">แลก<b>กัน</b></div>
+  app.appendChild($(`<div class="center"><div class="splash-logo">แลก<b>กัน</b></div>
     <div class="tag">LAKKAN · ระบบแลกเปลี่ยนที่เชื่อถือได้</div>
-    <div class="warnbox" style="text-align:left">ยังไม่ได้ตั้งค่า Firebase — เปิดไฟล์ <b>index.html</b> วางค่า <b>firebaseConfig</b> และ <b>GEMINI_API_KEY</b> ตามคู่มือ <b>README-ตั้งค่า.md</b> ก่อนใช้งาน</div>
-  </div>`));
+    <div class="warnbox" style="text-align:left">ยังไม่ได้ตั้งค่า Firebase — วางค่า <b>firebaseConfig</b> ในไฟล์ index.html ก่อนใช้งาน</div></div>`));
 }
-
 async function ensureProfile(u){
   const ref=doc(db,"users",u.uid);
   const snap=await getDoc(ref);
   if(!snap.exists()){
-    await setDoc(ref,{name:u.displayName||u.email.split("@")[0],email:u.email,phone:"",createdAt:serverTimestamp()});
+    await setDoc(ref,{name:u.displayName||u.email.split("@")[0],email:u.email,phone:"",kyc:{status:"none"},createdAt:serverTimestamp()});
   }
   S.profile=(await getDoc(ref)).data();
 }
-
 let unsubItems=null, unsubEx=null, unsubUsers=null;
 function subscribe(){
   unsubItems&&unsubItems(); unsubEx&&unsubEx(); unsubUsers&&unsubUsers();
   unsubItems=onSnapshot(collection(db,"items"),s=>{ S.items=s.docs.map(d=>({id:d.id,...d.data()})); render(); });
   unsubEx=onSnapshot(collection(db,"exchanges"),s=>{ S.exchanges=s.docs.map(d=>({id:d.id,...d.data()})); render(); });
-  unsubUsers=onSnapshot(collection(db,"users"),s=>{ S.users={}; s.docs.forEach(d=>S.users[d.id]=d.data()); render(); });
+  unsubUsers=onSnapshot(collection(db,"users"),s=>{ S.users={}; s.docs.forEach(d=>S.users[d.id]=d.data()); if(S.user&&S.users[S.user.uid])S.profile=S.users[S.user.uid]; render(); });
 }
 
-/* ---------- actions ---------- */
+/* ---------- auth actions ---------- */
 async function signUp(name,email,pass){ S.err="";
   try{ const c=await createUserWithEmailAndPassword(auth,email,pass);
-    await setDoc(doc(db,"users",c.user.uid),{name,email,phone:"",createdAt:serverTimestamp()});
+    await setDoc(doc(db,"users",c.user.uid),{name,email,phone:"",kyc:{status:"none"},createdAt:serverTimestamp()});
   }catch(e){ S.err=fbErr(e); render(); } }
 async function signIn(email,pass){ S.err=""; try{ await signInWithEmailAndPassword(auth,email,pass);}catch(e){ S.err=fbErr(e); render(); } }
 async function googleIn(){ S.err=""; try{ await signInWithPopup(auth,new GoogleAuthProvider()); }catch(e){ S.err=fbErr(e); render(); } }
 function fbErr(e){ const m=(e.code||"").replace("auth/","");
-  return ({"invalid-email":"อีเมลไม่ถูกต้อง","weak-password":"รหัสผ่านสั้นเกินไป (อย่างน้อย 6 ตัว)","email-already-in-use":"อีเมลนี้ถูกใช้แล้ว","invalid-credential":"อีเมลหรือรหัสผ่านไม่ถูกต้อง","popup-closed-by-user":"ปิดหน้าต่างก่อนเข้าสู่ระบบ"}[m]||("ผิดพลาด: "+(e.code||e.message))); }
+  return ({"invalid-email":"อีเมลไม่ถูกต้อง","weak-password":"รหัสผ่านสั้นเกินไป (อย่างน้อย 6 ตัว)","email-already-in-use":"อีเมลนี้ถูกใช้แล้ว","invalid-credential":"อีเมลหรือรหัสผ่านไม่ถูกต้อง","popup-closed-by-user":"ปิดหน้าต่างก่อนเข้าสู่ระบบ","unauthorized-domain":"โดเมนนี้ยังไม่ได้อนุญาตใน Firebase (Authentication → Settings → Authorized domains)"}[m]||("ผิดพลาด: "+(e.code||e.message))); }
 
-async function addItem(d){ await addDoc(collection(db,"items"),{...d,ownerUid:S.user.uid,ownerName:S.profile.name,status:"available",createdAt:serverTimestamp()}); S.view="myitems"; render(); }
-async function proposeExchange(myItemId,theirItem){
+/* ---------- KYC ---------- */
+function resizeImage(file,max){ return new Promise((res,rej)=>{
+  const r=new FileReader(); r.onload=()=>{ const img=new Image(); img.onload=()=>{
+    let{width:w,height:h}=img; if(w>h){ if(w>max){h=h*max/w;w=max;} } else { if(h>max){w=w*max/h;h=max;} }
+    const cv=document.createElement("canvas"); cv.width=w; cv.height=h; cv.getContext("2d").drawImage(img,0,0,w,h);
+    res(cv.toDataURL("image/jpeg",0.7)); }; img.onerror=rej; img.src=r.result; }; r.onerror=rej; r.readAsDataURL(file); }); }
+async function submitKYC(d){ await guard(async()=>{
+  await updateDoc(doc(db,"users",S.user.uid),{name:d.fullName||S.profile.name,phone:d.phone||"",kyc:{
+    status:"verified", fullName:d.fullName, idNumber:d.idNumber, phone:d.phone,
+    idPhoto:d.idPhoto||"", selfie:d.selfie||"", at:Date.now() }});
+  S.kycTmp={}; S.view="profile"; render(); alert("ยืนยันตัวตนสำเร็จ ✓ (จำลอง) — ตอนนี้ลงของและแลกได้แล้ว");
+}); }
+
+/* ---------- item / exchange actions (with error surfacing) ---------- */
+async function addItem(d){ await guard(async()=>{
+  await addDoc(collection(db,"items"),{...d,ownerUid:S.user.uid,ownerName:S.profile.name,status:"available",createdAt:serverTimestamp()});
+  S.view="myitems"; render(); }); }
+async function proposeExchange(myItemId,theirItem){ await guard(async()=>{
   await addDoc(collection(db,"exchanges"),{
     aUid:S.user.uid,aName:S.profile.name,aItemId:myItemId,
     bUid:theirItem.ownerUid,bName:theirItem.ownerName,bItemId:theirItem.id,
     state:"Proposed",aDeposited:false,bDeposited:false,aReceived:false,bReceived:false,
-    history:[{t:"Proposed",by:S.profile.name,at:Date.now()}],createdAt:serverTimestamp()
-  });
-  S.view="exchanges"; render();
-}
+    history:[{t:"Proposed",by:S.profile.name,at:Date.now()}],createdAt:serverTimestamp() });
+  S.view="exchanges"; render(); }); }
 async function setItemStatus(id,st){ await updateDoc(doc(db,"items",id),{status:st}); }
 async function exUpdate(ex,patch,note){
-  await updateDoc(doc(db,"exchanges",ex.id),{...patch, history:arrayUnion({t:note||patch.state||"update",by:S.profile.name,at:Date.now()})});
-}
-async function acceptEx(ex){ await exUpdate(ex,{state:"Accepted"},"Accepted");
-  await setItemStatus(ex.aItemId,"locked"); await setItemStatus(ex.bItemId,"locked"); }
-async function declineEx(ex){ await exUpdate(ex,{state:"Returned"},"ปฏิเสธ"); }
-async function deposit(ex){ const mine=ex.aUid===S.user.uid?"aDeposited":"bDeposited";
-  const patch={[mine]:true}; const other=mine==="aDeposited"?ex.bDeposited:ex.aDeposited;
-  if(other) patch.state="Deposited";
-  await exUpdate(ex,patch,"วางมัดจำ (จำลอง)"); }
-async function hubReceive(ex){ await exUpdate(ex,{state:"AtHub"},"รับเข้าฮับ"); }
-async function hubValidate(ex,pass){ if(pass){ await exUpdate(ex,{state:"Validated"},"ตรวจผ่าน (เทียบรูป)"); }
-  else { await exUpdate(ex,{state:"Returned"},"ตรวจไม่ผ่าน ตีกลับ"); await setItemStatus(ex.aItemId,"available"); await setItemStatus(ex.bItemId,"available"); } }
-async function hubLock(ex){ await exUpdate(ex,{state:"Locked"},"ล็อก & ปล่อยไขว้พร้อมกัน"); }
-async function hubShip(ex){ await exUpdate(ex,{state:"Shipping"},"จำลองจัดส่ง"); }
-async function confirmReceive(ex){ const mine=ex.aUid===S.user.uid?"aReceived":"bReceived";
-  const patch={[mine]:true}; const other=mine==="aReceived"?ex.bReceived:ex.aReceived;
-  if(other){ patch.state="Completed"; }
+  await updateDoc(doc(db,"exchanges",ex.id),{...patch, history:arrayUnion({t:note||patch.state||"update",by:S.profile.name,at:Date.now()})}); }
+async function acceptEx(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Accepted"},"Accepted");
+  await setItemStatus(ex.aItemId,"locked"); await setItemStatus(ex.bItemId,"locked"); }); }
+async function declineEx(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Returned"},"ปฏิเสธ"); }); }
+async function deposit(ex){ await guard(async()=>{ const mine=ex.aUid===S.user.uid?"aDeposited":"bDeposited";
+  const patch={[mine]:true}; const other=mine==="aDeposited"?ex.bDeposited:ex.aDeposited; if(other) patch.state="Deposited";
+  await exUpdate(ex,patch,"วางมัดจำ (จำลอง)"); }); }
+async function hubReceive(ex){ await guard(async()=>{ await exUpdate(ex,{state:"AtHub"},"รับเข้าฮับ"); }); }
+async function hubValidate(ex,pass){ await guard(async()=>{ if(pass){ await exUpdate(ex,{state:"Validated"},"ตรวจผ่าน (เทียบรูป)"); }
+  else { await exUpdate(ex,{state:"Returned"},"ตรวจไม่ผ่าน ตีกลับ"); await setItemStatus(ex.aItemId,"available"); await setItemStatus(ex.bItemId,"available"); } }); }
+async function hubLock(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Locked"},"ล็อก & ปล่อยไขว้พร้อมกัน"); }); }
+async function hubShip(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Shipping"},"จำลองจัดส่ง"); }); }
+async function confirmReceive(ex){ await guard(async()=>{ const mine=ex.aUid===S.user.uid?"aReceived":"bReceived";
+  const patch={[mine]:true}; const other=mine==="aReceived"?ex.bReceived:ex.aReceived; if(other) patch.state="Completed";
   await exUpdate(ex,patch,"ยืนยันได้รับของ");
-  if(other){ await setItemStatus(ex.aItemId,"swapped"); await setItemStatus(ex.bItemId,"swapped"); } }
+  if(other){ await setItemStatus(ex.aItemId,"swapped"); await setItemStatus(ex.bItemId,"swapped"); } }); }
+async function seedDemo(){ await guard(async()=>{
+  const s=[["รองเท้าผ้าใบ ไซซ์ 42","รองเท้า",500],["เสื้อแจ็คเก็ตยีนส์","เสื้อผ้า",700],["หนังสือนิยายชุด","หนังสือ",300],["ตุ๊กตาหมีวินเทจ","ของเล่น",250]];
+  for(const [t,c,v] of s){ await addDoc(collection(db,"items"),{title:t,category:c,estValue:v,desc:"ของสภาพดี (เดโม)",ownerUid:S.user.uid,ownerName:S.profile.name,status:"available",createdAt:serverTimestamp()}); }
+  alert("สร้างรายการตัวอย่าง 4 ชิ้นแล้ว"); }); }
 
-async function seedDemo(){
-  const samples=[["รองเท้าผ้าใบ ไซซ์ 42","รองเท้า",500],["เสื้อแจ็คเก็ตยีนส์","เสื้อผ้า",700],["หนังสือนิยายชุด","หนังสือ",300],["ตุ๊กตาหมีวินเทจ","ของเล่น",250]];
-  for(const [t,c,v] of samples){ await addItem2({title:t,category:c,estValue:v,desc:"ของสภาพดี (เดโม)"}); }
-  alert("สร้างรายการตัวอย่างให้บัญชีนี้แล้ว 4 ชิ้น");
-}
-async function addItem2(d){ await addDoc(collection(db,"items"),{...d,ownerUid:S.user.uid,ownerName:S.profile.name,status:"available",createdAt:serverTimestamp()}); }
-
-/* ---------- Gemini AI matching ---------- */
+/* ---------- Gemini ---------- */
 async function aiMatch(){
-  if(GEMINI_API_KEY.startsWith(firebaseConfig)){ S.ai="(ยังไม่ได้ตั้งค่า GEMINI_API_KEY ในไฟล์ index.html)"; render(); return; }
+  if(!AI_ON){ S.ai="(ยังไม่ได้ตั้งค่า GEMINI_API_KEY ในไฟล์ index.html — ฟีเจอร์อื่นใช้ได้ปกติ)"; render(); return; }
   S.aiLoading=true; render();
   const mine=myItems().map(i=>`${i.title} (${i.category}, ~${i.estValue}฿)`).join("; ")||"(ยังไม่มีของ)";
-  const others=availOthers().map(i=>`[${i.id}] ${i.title} โดย ${i.ownerName} (${i.category}, ~${i.estValue}฿)`).join("; ")||"(ไม่มีของให้แลก)";
-  const prompt=`คุณเป็นผู้ช่วยจับคู่แลกเปลี่ยนของมือสองในแอป "แลกกัน". ของของฉัน: ${mine}. ของที่คนอื่นลงไว้: ${others}. `+
-    `เลือกการจับคู่ที่น่าสนใจที่สุด 3 คู่ (ของฉัน ↔ ของคนอื่น) โดยดูมูลค่าใกล้เคียงและความน่าจะพอใจ. ตอบเป็นภาษาไทยสั้นๆ เป็นข้อ 1-3 พร้อมเหตุผลบรรทัดเดียวต่อคู่.`;
+  const others=availOthers().map(i=>`${i.title} โดย ${i.ownerName} (${i.category}, ~${i.estValue}฿)`).join("; ")||"(ไม่มีของให้แลก)";
+  const prompt=`คุณเป็นผู้ช่วยจับคู่แลกเปลี่ยนของมือสองในแอป "แลกกัน". ของของฉัน: ${mine}. ของที่คนอื่นลงไว้: ${others}. เลือกการจับคู่ที่น่าสนใจที่สุด 3 คู่ (ของฉัน ↔ ของคนอื่น) โดยดูมูลค่าใกล้เคียง. ตอบภาษาไทยสั้น ๆ เป็นข้อ 1-3 พร้อมเหตุผลบรรทัดเดียว.`;
   try{
     const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+      method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
     const j=await r.json();
-    S.ai=j?.candidates?.[0]?.content?.parts?.[0]?.text || ("AI ไม่ตอบ: "+JSON.stringify(j).slice(0,180));
+    S.ai=j?.candidates?.[0]?.content?.parts?.[0]?.text || ("AI ไม่ตอบ: "+JSON.stringify(j).slice(0,200));
   }catch(e){ S.ai="เรียก AI ไม่สำเร็จ: "+e.message; }
   S.aiLoading=false; render();
 }
 
-/* ============================================================ RENDER ============================================================ */
+/* ============================ RENDER ============================ */
 function render(){
   if(!CONFIGURED){ renderSetupNeeded(); return; }
   if(!S.user){ renderAuth(); return; }
+  if(!S.profile){ return; }
   app.innerHTML="";
   app.appendChild(topbar());
   app.appendChild(modstrip());
@@ -243,12 +256,10 @@ function render(){
   app.appendChild(body);
   if(S.role==="member") app.appendChild(bottomnav());
 }
-
 function topbar(){
   const t=$(`<div class="topbar"><div class="logo">แลก<b>กัน</b></div><div class="sp"></div>
-    <div class="who">${esc(S.profile?.name||"")}</div></div>`);
-  const b=$(`<button class="btn ghost sm" style="width:auto;padding:6px 10px">ออก</button>`);
-  b.onclick=()=>signOut(auth); t.appendChild(b); return t;
+    <div class="who">${esc(S.profile?.name||"")}${verified()?'<span class="vbadge">✓ ยืนยันแล้ว</span>':''}</div></div>`);
+  const b=$(`<button class="btn ghost sm" style="width:auto;padding:6px 10px">ออก</button>`); b.onclick=()=>signOut(auth); t.appendChild(b); return t;
 }
 function modstrip(){
   const mods=[["member","◍ สมาชิก"],["hub","🏭 ฮับ"],["admin","📊 แอดมิน"],["finance","💰 การเงิน"],["company","🏢 บริษัท"]];
@@ -264,7 +275,6 @@ function bottomnav(){
     b.onclick=()=>{S.view=i[0];S.sel=null;render();}; n.appendChild(b); });
   return n;
 }
-
 /* ---------- AUTH ---------- */
 function renderAuth(){
   app.innerHTML="";
@@ -272,52 +282,85 @@ function renderAuth(){
   wrap.appendChild($(`<div class="splash-logo">แลก<b>กัน</b></div>`));
   wrap.appendChild($(`<div class="tag">ซื้อ–ขาย–แลกเปลี่ยนของมือสอง อย่างเชื่อถือได้</div>`));
   const c=$(`<div class="card" style="width:100%;text-align:left"></div>`);
-  let mode="in"; // in | up
-  const render2=()=>{
-    c.innerHTML="";
-    c.appendChild($(`<h2 class="title">${mode==="in"?"เข้าสู่ระบบ":"สมัครสมาชิก"}</h2>`));
+  let mode="in";
+  const r2=()=>{ c.innerHTML="";
+    const seg=$(`<div class="seg"><button class="${mode==='in'?'on':''}">เข้าสู่ระบบ</button><button class="${mode==='up'?'on':''}">สมัครสมาชิก</button></div>`);
+    seg.children[0].onclick=()=>{mode="in";S.err="";r2();}; seg.children[1].onclick=()=>{mode="up";S.err="";r2();}; c.appendChild(seg);
     let name,email,pass;
     if(mode==="up"){ const f=$(`<div class="field"><label>ชื่อ</label><input placeholder="ชื่อของคุณ"></div>`); name=f.querySelector("input"); c.appendChild(f); }
     const fe=$(`<div class="field"><label>อีเมล</label><input type="email" placeholder="you@email.com"></div>`); email=fe.querySelector("input"); c.appendChild(fe);
     const fp=$(`<div class="field"><label>รหัสผ่าน</label><input type="password" placeholder="อย่างน้อย 6 ตัว"></div>`); pass=fp.querySelector("input"); c.appendChild(fp);
     if(S.err) c.appendChild($(`<div class="err">${esc(S.err)}</div>`));
-    const go=$(`<button class="btn pink" style="margin-top:6px">${mode==="in"?"เข้าสู่ระบบ":"สมัครและเข้าใช้"}</button>`);
-    go.onclick=()=>{ if(mode==="in") signIn(email.value.trim(),pass.value); else signUp((name.value||"").trim()||email.value.split("@")[0],email.value.trim(),pass.value); };
-    c.appendChild(go);
+    const go=$(`<button class="btn pink" style="margin-top:4px">${mode==="in"?"เข้าสู่ระบบ":"สมัครและเข้าใช้"}</button>`);
+    go.onclick=()=>{ if(mode==="in") signIn(email.value.trim(),pass.value); else signUp((name.value||"").trim()||email.value.split("@")[0],email.value.trim(),pass.value); }; c.appendChild(go);
     const g=$(`<button class="btn ghost" style="margin-top:8px">➤ ดำเนินการด้วย Google</button>`); g.onclick=googleIn; c.appendChild(g);
-    const sw=$(`<div style="text-align:center;margin-top:12px" class="link">${mode==="in"?"ยังไม่มีบัญชี? สมัครสมาชิก":"มีบัญชีแล้ว? เข้าสู่ระบบ"}</div>`);
-    sw.onclick=()=>{mode=mode==="in"?"up":"in";S.err="";render2();}; c.appendChild(sw);
   };
-  render2(); wrap.appendChild(c);
+  r2(); wrap.appendChild(c);
   wrap.appendChild($(`<div class="small" style="margin-top:14px">เดโม: สมัคร 2 บัญชี (หรือ Google + อีเมล) เพื่อทดสอบการแลกระหว่างกัน</div>`));
   app.appendChild(wrap);
 }
-
 /* ---------- MEMBER ---------- */
 function memberView(){
-  if(S.view==="feed") return feed();
-  if(S.view==="myitems") return myItemsView();
-  if(S.view==="additem") return addItemView();
-  if(S.view==="exchanges") return exchangesView();
-  if(S.view==="profile") return profileView();
-  if(S.view==="itemDetail") return itemDetailView();
-  if(S.view==="exDetail") return exDetailView();
-  if(S.view==="ai") return aiView();
+  const v=S.view;
+  if(v==="kyc") return kycView();
+  if(v==="myitems") return myItemsView();
+  if(v==="additem") return verified()?addItemView():kycGate("ลงของ");
+  if(v==="exchanges") return exchangesView();
+  if(v==="profile") return profileView();
+  if(v==="itemDetail") return itemDetailView();
+  if(v==="exDetail") return exDetailView();
+  if(v==="ai") return aiView();
   return feed();
 }
+function kycGate(what){
+  const w=$(`<div></div>`);
+  w.appendChild($(`<h2 class="title">ยืนยันตัวตนก่อน</h2><div class="sub">เพื่อความปลอดภัยของการแลกเปลี่ยน ต้องยืนยันตัวตน (KYC) ก่อน${esc(what)}</div>`));
+  w.appendChild($(`<div class="kyc-banner"><div style="font-size:30px">🪪</div><div style="flex:1"><b>ยืนยันตัวตน (KYC)</b><div class="small">กรอกข้อมูล + อัปรูปบัตร/เซลฟี่ · ใช้เวลา 1 นาที (จำลอง)</div></div></div>`));
+  const b=$(`<button class="btn pink">เริ่มยืนยันตัวตน</button>`); b.onclick=()=>{S.view="kyc";render();}; w.appendChild(b);
+  return w;
+}
+function kycView(){
+  const w=$(`<div></div>`);
+  const back=$(`<div class="link" style="margin-bottom:8px">‹ กลับ</div>`); back.onclick=()=>{S.view="profile";render();}; w.appendChild(back);
+  w.appendChild($(`<h2 class="title">🪪 ยืนยันตัวตน (KYC)</h2><div class="sub">ข้อมูลจะถูกเก็บเป็นความลับ · เวอร์ชัน Pilot เป็นการจำลอง</div>`));
+  if(verified()) w.appendChild($(`<div class="okbox">บัญชีนี้ยืนยันตัวตนแล้ว ✓ — ส่งใหม่เพื่ออัปเดตข้อมูลได้</div>`));
+  const c=$(`<div class="card"></div>`);
+  const fn=$(`<div class="field"><label>ชื่อ-นามสกุล (ตามบัตร)</label><input value="${esc(S.profile?.kyc?.fullName||S.profile?.name||"")}"></div>`);
+  const idn=$(`<div class="field"><label>เลขบัตรประชาชน</label><input inputmode="numeric" maxlength="13" placeholder="13 หลัก" value="${esc(S.profile?.kyc?.idNumber||"")}"></div>`);
+  const ph=$(`<div class="field"><label>เบอร์โทร</label><input inputmode="tel" placeholder="08x-xxx-xxxx" value="${esc(S.profile?.phone||"")}"></div>`);
+  c.append(fn,idn,ph);
+  const up=(labelTxt,key)=>{ const box=$(`<div class="field"><label>${labelTxt}</label><div class="up"><div class="ph">📷</div><div class="small">แตะเพื่อถ่าย/เลือกรูป</div></div><input type="file" accept="image/*" capture="environment" style="display:none"></div>`);
+    const drop=box.querySelector(".up"), input=box.querySelector("input");
+    drop.onclick=()=>input.click();
+    input.onchange=async()=>{ if(!input.files[0])return; try{ const b64=await resizeImage(input.files[0],640); S.kycTmp[key]=b64; drop.innerHTML=`<img src="${b64}">`; }catch(e){ alert("อ่านรูปไม่สำเร็จ"); } };
+    if(S.kycTmp[key]) drop.innerHTML=`<img src="${S.kycTmp[key]}">`;
+    return box; };
+  c.appendChild(up("รูปบัตรประชาชน","idPhoto"));
+  c.appendChild(up("รูปเซลฟี่คู่บัตร","selfie"));
+  w.appendChild(c);
+  const go=$(`<button class="btn pink">ยืนยันตัวตน</button>`);
+  go.onclick=()=>{ const fullName=fn.querySelector("input").value.trim(), idNumber=idn.querySelector("input").value.trim(), phone=ph.querySelector("input").value.trim();
+    if(!fullName)return alert("กรอกชื่อ-นามสกุล"); if(idNumber.length<13)return alert("เลขบัตรต้อง 13 หลัก");
+    submitKYC({fullName,idNumber,phone,idPhoto:S.kycTmp.idPhoto,selfie:S.kycTmp.selfie}); };
+  w.appendChild(go);
+  w.appendChild($(`<div class="small" style="text-align:center;margin-top:8px">* เวอร์ชันจริงจะเชื่อมผู้ให้บริการ e-KYC/NDID · เวอร์ชันนี้อนุมัติอัตโนมัติเพื่อทดสอบ</div>`));
+  return w;
+}
 function itemCard(i,onclick){
-  const c=$(`<div class="card"><div class="item"><div class="thumb">${CATICON[i.category]||"📦"}</div>
+  const c=$(`<div class="card" style="padding:12px"><div class="item"><div class="thumb">${i.photo?`<img src="${i.photo}">`:(CATICON[i.category]||"📦")}</div>
     <div style="flex:1"><div class="t">${esc(i.title)}</div><div class="m">${esc(i.category)} · ~${i.estValue||0}฿ · โดย ${esc(i.ownerName||"")}</div></div>
     <span class="pill ${i.status==='available'?'p-av':i.status==='locked'?'p-warn':'p-ok'}">${i.status==='available'?'ว่าง':i.status==='locked'?'กำลังแลก':'แลกแล้ว'}</span></div></div>`);
-  if(onclick) c.onclick=onclick; c.style.cursor="pointer"; return c;
+  if(onclick){ c.onclick=onclick; c.style.cursor="pointer"; } return c;
 }
 function feed(){
   const w=$(`<div></div>`);
-  w.appendChild($(`<h2 class="title">ค้นหาของเพื่อแลก</h2><div class="sub">ของที่ราคาเป็นศูนย์เมื่อวางเฉย — แลกเป็นของที่คุณอยากได้</div>`));
+  w.appendChild($(`<h2 class="title">ค้นหาของเพื่อแลก</h2><div class="sub">ของที่วางเฉย = ฿0 · แลกเป็นของที่คุณอยากได้ จ่ายแค่ค่าส่ง</div>`));
+  if(!verified()){ const kb=$(`<div class="kyc-banner"><div style="font-size:26px">🪪</div><div style="flex:1"><b>ยืนยันตัวตนเพื่อเริ่มแลก</b><div class="small">ปลดล็อกการลงของและการแลกเปลี่ยน</div></div></div>`);
+    const b=$(`<button class="btn pink sm">ยืนยัน</button>`); b.onclick=()=>{S.view="kyc";render();}; kb.appendChild(b); w.appendChild(kb); }
   const ai=$(`<div class="card ai row"><div style="flex:1"><b>✨ ให้ AI ช่วยจับคู่</b><div class="small">Gemini แนะนำคู่แลกที่เหมาะกับของคุณ</div></div></div>`);
   const ab=$(`<button class="btn blue sm">จับคู่</button>`); ab.onclick=()=>{S.view="ai";S.ai=null;render();}; ai.appendChild(ab); w.appendChild(ai);
   const list=availOthers();
-  if(!list.length) w.appendChild($(`<div class="hint">ยังไม่มีของจากคนอื่น — ชวนเพื่อนสมัครและลงของ หรือไปที่โมดูลแอดมินกด "สร้างรายการตัวอย่าง"</div>`));
+  if(!list.length) w.appendChild($(`<div class="hint">ยังไม่มีของจากคนอื่น — ชวนเพื่อนสมัครและลงของ หรือไปที่โมดูล 📊 แอดมิน กด "สร้างรายการตัวอย่าง"</div>`));
   list.forEach(i=>w.appendChild(itemCard(i,()=>{S.sel=i.id;S.view="itemDetail";render();})));
   return w;
 }
@@ -325,10 +368,12 @@ function itemDetailView(){
   const i=S.items.find(x=>x.id===S.sel); if(!i) return feed();
   const w=$(`<div></div>`);
   const back=$(`<div class="link" style="margin-bottom:8px">‹ กลับ</div>`); back.onclick=()=>{S.view="feed";render();}; w.appendChild(back);
-  w.appendChild($(`<div class="card"><div class="thumb" style="width:100%;height:150px;font-size:60px;border-radius:16px">${CATICON[i.category]||"📦"}</div>
-    <h2 class="title" style="margin-top:10px">${esc(i.title)}</h2>
+  w.appendChild($(`<div class="card"><div class="thumb" style="width:100%;height:170px;font-size:64px;border-radius:16px">${i.photo?`<img src="${i.photo}">`:(CATICON[i.category]||"📦")}</div>
+    <h2 class="title" style="margin-top:12px">${esc(i.title)}</h2>
     <div class="sub">${esc(i.category)} · มูลค่าประเมิน ~${i.estValue||0}฿ · เจ้าของ ${esc(i.ownerName)}</div>
     <div style="font-size:14px;color:var(--slate)">${esc(i.desc||"")}</div></div>`));
+  if(!verified()){ const g=$(`<div class="hint">ยืนยันตัวตนก่อนจึงจะเสนอแลกได้</div>`); w.appendChild(g);
+    const b=$(`<button class="btn pink">ยืนยันตัวตน</button>`); b.onclick=()=>{S.view="kyc";render();}; w.appendChild(b); return w; }
   const mine=myItems().filter(x=>x.status==="available");
   const box=$(`<div class="card"><label>เลือกของของคุณเพื่อเสนอแลก</label></div>`);
   if(!mine.length){ box.appendChild($(`<div class="hint" style="margin-top:8px">คุณยังไม่มีของว่างให้แลก — ไปที่ "ลงของ" ก่อน</div>`)); }
@@ -348,18 +393,20 @@ function addItemView(){
   const c=$(`<div class="card"></div>`);
   const ft=$(`<div class="field"><label>ชื่อสิ่งของ</label><input placeholder="เช่น รองเท้าผ้าใบ ไซซ์ 42"></div>`);
   const fc=$(`<div class="field"><label>หมวดหมู่</label><select>${CATS.map(c=>`<option>${c}</option>`).join("")}</select></div>`);
-  const fv=$(`<div class="field"><label>มูลค่าประเมิน (บาท)</label><input type="number" placeholder="เช่น 500"></div>`);
+  const fv=$(`<div class="field"><label>มูลค่าประเมิน (บาท)</label><input type="number" inputmode="numeric" placeholder="เช่น 500"></div>`);
   const fd=$(`<div class="field"><label>รายละเอียด</label><textarea rows="3" placeholder="สภาพ ตำหนิ ฯลฯ"></textarea></div>`);
-  c.append(ft,fc,fv,fd);
+  let photo="";
+  const pbox=$(`<div class="field"><label>รูปสินค้า (ไม่บังคับ)</label><div class="up"><div class="ph">📷</div><div class="small">แตะเพื่อถ่าย/เลือกรูป</div></div><input type="file" accept="image/*" style="display:none"></div>`);
+  pbox.querySelector(".up").onclick=()=>pbox.querySelector("input").click();
+  pbox.querySelector("input").onchange=async(e)=>{ if(!e.target.files[0])return; try{ photo=await resizeImage(e.target.files[0],640); pbox.querySelector(".up").innerHTML=`<img src="${photo}">`; }catch(_){alert("อ่านรูปไม่สำเร็จ");} };
+  c.append(ft,fc,fv,fd,pbox);
   const go=$(`<button class="btn pink">บันทึกและลงของ</button>`);
   go.onclick=()=>{ const title=ft.querySelector("input").value.trim(); if(!title)return alert("กรอกชื่อสิ่งของ");
-    addItem({title,category:fc.querySelector("select").value,estValue:Number(fv.querySelector("input").value)||0,desc:fd.querySelector("textarea").value.trim()}); };
+    addItem({title,category:fc.querySelector("select").value,estValue:Number(fv.querySelector("input").value)||0,desc:fd.querySelector("textarea").value.trim(),photo}); };
   c.appendChild(go); w.appendChild(c); return w;
 }
-function stateFlow(cur){
-  const idx=STATES.indexOf(cur);
-  return `<div class="state-flow">${STATES.map((s,k)=>`<span class="${k<idx?'done':k===idx?'cur':''}">${STATE_TH[s]}</span>`).join("")}${cur==="Returned"?'<span class="cur" style="background:var(--red)">ตีกลับ</span>':''}</div>`;
-}
+function stateFlow(cur){ const idx=STATES.indexOf(cur);
+  return `<div class="state-flow">${STATES.map((s,k)=>`<span class="${k<idx?'done':k===idx?'cur':''}">${STATE_TH[s]}</span>`).join("")}${cur==="Returned"?'<span class="cur" style="background:var(--red)">ตีกลับ</span>':''}</div>`; }
 function exchangesView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">การแลกของฉัน</h2><div class="sub">ทั้งที่ฉันเสนอและมีคนเสนอมา</div>`));
   const mine=S.exchanges.filter(e=>e.aUid===S.user.uid||e.bUid===S.user.uid);
@@ -375,26 +422,25 @@ function exDetailView(){
   const e=S.exchanges.find(x=>x.id===S.sel); if(!e) return exchangesView();
   const ai=S.items.find(x=>x.id===e.aItemId),bi=S.items.find(x=>x.id===e.bItemId);
   const w=$(`<div></div>`); const back=$(`<div class="link" style="margin-bottom:8px">‹ กลับ</div>`); back.onclick=()=>{S.view="exchanges";render();}; w.appendChild(back);
-  w.appendChild($(`<div class="card"><div class="row"><div style="flex:1;text-align:center"><div class="thumb" style="margin:0 auto 6px">${CATICON[ai?.category]||"📦"}</div><b>${esc(ai?.title||"?")}</b><div class="small">${esc(e.aName)}</div></div>
+  w.appendChild($(`<div class="card"><div class="row"><div style="flex:1;text-align:center"><div class="thumb" style="margin:0 auto 6px">${ai?.photo?`<img src="${ai.photo}">`:(CATICON[ai?.category]||"📦")}</div><b>${esc(ai?.title||"?")}</b><div class="small">${esc(e.aName)}</div></div>
     <div style="font-size:22px">🔄</div>
-    <div style="flex:1;text-align:center"><div class="thumb" style="margin:0 auto 6px">${CATICON[bi?.category]||"📦"}</div><b>${esc(bi?.title||"?")}</b><div class="small">${esc(e.bName)}</div></div></div>
+    <div style="flex:1;text-align:center"><div class="thumb" style="margin:0 auto 6px">${bi?.photo?`<img src="${bi.photo}">`:(CATICON[bi?.category]||"📦")}</div><b>${esc(bi?.title||"?")}</b><div class="small">${esc(e.bName)}</div></div></div>
     ${stateFlow(e.state)}</div>`));
   const me=S.user.uid, isA=e.aUid===me, isB=e.bUid===me;
   const act=$(`<div class="card"></div>`); let has=false;
   const addBtn=(label,cls,fn)=>{ const b=$(`<button class="btn ${cls}" style="margin-top:8px">${label}</button>`); b.onclick=fn; act.appendChild(b); has=true; };
   if(e.state==="Proposed" && isB){ addBtn("✓ ยอมรับการแลก","green",()=>acceptEx(e)); addBtn("✕ ปฏิเสธ","red",()=>declineEx(e)); }
-  if(e.state==="Proposed" && isA){ act.appendChild($(`<div class="small">รอ ${esc(e.bName)} ยอมรับ</div>`)); has=true; }
+  else if(e.state==="Proposed" && isA){ act.appendChild($(`<div class="small">รอ ${esc(e.bName)} ยอมรับ</div>`)); has=true; }
   if(e.state==="Accepted"){ const mineDep=isA?e.aDeposited:e.bDeposited;
-    if(mineDep) act.appendChild($(`<div class="small">คุณวางมัดจำแล้ว — รออีกฝ่าย</div>`)),has=true;
+    if(mineDep){ act.appendChild($(`<div class="small">คุณวางมัดจำแล้ว — รออีกฝ่าย</div>`)); has=true; }
     else addBtn(`💳 จำลองวางมัดจำ ${DEPOSIT}฿`,"pink",()=>deposit(e)); }
   if(e.state==="Shipping"){ const mineRec=isA?e.aReceived:e.bReceived;
-    if(mineRec) act.appendChild($(`<div class="small">คุณยืนยันรับของแล้ว — รออีกฝ่าย</div>`)),has=true;
+    if(mineRec){ act.appendChild($(`<div class="small">คุณยืนยันรับของแล้ว — รออีกฝ่าย</div>`)); has=true; }
     else addBtn("📦 ยืนยันได้รับของ (จำลอง)","green",()=>confirmReceive(e)); }
-  if(["Deposited","AtHub","Validated","Locked"].includes(e.state)) { act.appendChild($(`<div class="small">อยู่ระหว่างดำเนินการที่ฮับ — ติดตามในโมดูล 🏭 ฮับ</div>`)); has=true; }
-  if(e.state==="Completed") act.appendChild($(`<div class="p-ok pill">แลกสำเร็จ 🎉</div>`)),has=true;
-  if(e.state==="Returned") act.appendChild($(`<div class="p-warn pill">รายการถูกตีกลับ/ยกเลิก</div>`)),has=true;
+  if(["Deposited","AtHub","Validated","Locked"].includes(e.state)){ act.appendChild($(`<div class="small">อยู่ระหว่างดำเนินการที่ฮับ — ติดตามในโมดูล 🏭 ฮับ</div>`)); has=true; }
+  if(e.state==="Completed"){ act.appendChild($(`<span class="pill p-ok">แลกสำเร็จ 🎉</span>`)); has=true; }
+  if(e.state==="Returned"){ act.appendChild($(`<span class="pill p-warn">รายการถูกตีกลับ/ยกเลิก</span>`)); has=true; }
   if(has) w.appendChild(act);
-  // history
   const h=$(`<div class="card"><label>ประวัติสถานะ</label></div>`);
   (e.history||[]).slice().reverse().forEach(x=>h.appendChild($(`<div class="small" style="margin-top:5px">• ${esc(STATE_TH[x.t]||x.t)} — ${esc(x.by)}</div>`)));
   w.appendChild(h); return w;
@@ -403,16 +449,21 @@ function aiView(){
   const w=$(`<div></div>`); const back=$(`<div class="link" style="margin-bottom:8px">‹ กลับ</div>`); back.onclick=()=>{S.view="feed";render();}; w.appendChild(back);
   w.appendChild($(`<h2 class="title">✨ AI จับคู่การแลก</h2><div class="sub">Gemini วิเคราะห์ของคุณเทียบกับของในระบบ</div>`));
   const c=$(`<div class="card ai"></div>`);
-  if(S.aiLoading){ c.appendChild($(`<div class="spin"></div><div class="small" style="text-align:center">กำลังให้ AI คิด…</div>`)); }
-  else if(S.ai){ c.appendChild($(`<div style="font-size:14px;white-space:pre-wrap;line-height:1.7">${esc(S.ai)}</div>`)); }
-  else { c.appendChild($(`<div class="small">กดปุ่มเพื่อให้ AI แนะนำคู่แลกที่เหมาะกับของคุณ</div>`)); }
+  if(S.aiLoading) c.appendChild($(`<div class="spin"></div><div class="small" style="text-align:center">กำลังให้ AI คิด…</div>`));
+  else if(S.ai) c.appendChild($(`<div style="font-size:14px;white-space:pre-wrap;line-height:1.7">${esc(S.ai)}</div>`));
+  else c.appendChild($(`<div class="small">กดปุ่มเพื่อให้ AI แนะนำคู่แลกที่เหมาะกับของคุณ</div>`));
   const go=$(`<button class="btn blue" style="margin-top:10px">${S.ai?"วิเคราะห์อีกครั้ง":"เริ่มจับคู่ด้วย AI"}</button>`); go.onclick=aiMatch; c.appendChild(go);
   w.appendChild(c); return w;
 }
 function profileView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">โปรไฟล์</h2>`));
-  const c=$(`<div class="card"><div class="item"><div class="thumb">👤</div><div><div class="t">${esc(S.profile.name)}</div><div class="m">${esc(S.profile.email||"")}</div></div></div></div>`);
+  const c=$(`<div class="card"><div class="item"><div class="thumb">${S.profile?.kyc?.selfie?`<img src="${S.profile.kyc.selfie}">`:"👤"}</div>
+    <div style="flex:1"><div class="t">${esc(S.profile.name)} ${verified()?'<span class="vbadge">✓ ยืนยันแล้ว</span>':''}</div><div class="m">${esc(S.profile.email||"")}</div>
+    ${S.profile.phone?`<div class="m">📞 ${esc(S.profile.phone)}</div>`:""}</div></div></div>`);
   w.appendChild(c);
+  if(!verified()){ const kb=$(`<div class="kyc-banner"><div style="font-size:26px">🪪</div><div style="flex:1"><b>ยังไม่ได้ยืนยันตัวตน</b><div class="small">ยืนยันเพื่อลงของและแลกเปลี่ยน</div></div></div>`);
+    const b=$(`<button class="btn pink sm">ยืนยัน</button>`); b.onclick=()=>{S.view="kyc";render();}; kb.appendChild(b); w.appendChild(kb); }
+  else { const b=$(`<button class="btn ghost" style="margin-bottom:12px">🪪 ดู/แก้ไขข้อมูล KYC</button>`); b.onclick=()=>{S.view="kyc";render();}; w.appendChild(b); }
   const stat=$(`<div class="kpi"></div>`);
   stat.appendChild($(`<div class="k"><div class="n">${myItems().length}</div><div class="l">ของที่ลงไว้</div></div>`));
   const done=S.exchanges.filter(e=>(e.aUid===S.user.uid||e.bUid===S.user.uid)&&e.state==="Completed").length;
@@ -421,7 +472,6 @@ function profileView(){
   const out=$(`<button class="btn ghost" style="margin-top:12px">ออกจากระบบ</button>`); out.onclick=()=>signOut(auth); w.appendChild(out);
   return w;
 }
-
 /* ---------- HUB ---------- */
 function hubView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">🏭 โมดูลฮับ</h2><div class="sub">ตรวจสอบ · ล็อกไขว้ · จัดส่ง</div>`));
@@ -432,61 +482,54 @@ function hubView(){
     const c=$(`<div class="card"><div class="row"><div style="flex:1"><b>${esc(ai?.title||"?")}</b> ↔ <b>${esc(bi?.title||"?")}</b></div><span class="pill p-blue">${STATE_TH[e.state]}</span></div>${stateFlow(e.state)}</div>`);
     if(e.state==="Deposited"){ const b=$(`<button class="btn navy sm" style="margin-top:6px">รับของเข้าฮับ</button>`); b.onclick=()=>hubReceive(e); c.appendChild(b); }
     if(e.state==="AtHub"){ const r=$(`<div class="row" style="margin-top:8px;gap:8px"></div>`);
-      const p=$(`<button class="btn green sm" style="flex:1">✓ ตรวจผ่าน (เทียบรูป)</button>`); p.onclick=()=>hubValidate(e,true);
+      const p=$(`<button class="btn green sm" style="flex:1">✓ ตรวจผ่าน</button>`); p.onclick=()=>hubValidate(e,true);
       const f=$(`<button class="btn red sm" style="flex:1">✕ ไม่ผ่าน</button>`); f.onclick=()=>hubValidate(e,false); r.append(p,f); c.appendChild(r); }
     if(e.state==="Validated"){ const b=$(`<button class="btn pink sm" style="margin-top:6px">🔒 ล็อก & ปล่อยไขว้พร้อมกัน</button>`); b.onclick=()=>hubLock(e); c.appendChild(b); }
     if(e.state==="Locked"){ const b=$(`<button class="btn blue sm" style="margin-top:6px">🚚 จำลองจัดส่งออกจากฮับ</button>`); b.onclick=()=>hubShip(e); c.appendChild(b); }
     w.appendChild(c); });
   return w;
 }
-
-/* ---------- ADMIN ---------- */
+/* ---------- ADMIN / FINANCE / COMPANY ---------- */
 function adminView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">📊 แอดมิน</h2><div class="sub">ภาพรวมระบบ</div>`));
   const k=$(`<div class="kpi"></div>`);
   k.appendChild($(`<div class="k"><div class="n">${Object.keys(S.users).length}</div><div class="l">ผู้ใช้</div></div>`));
+  k.appendChild($(`<div class="k"><div class="n">${Object.values(S.users).filter(u=>u.kyc?.status==='verified').length}</div><div class="l">ยืนยันตัวตนแล้ว</div></div>`));
   k.appendChild($(`<div class="k"><div class="n">${S.items.length}</div><div class="l">รายการของ</div></div>`));
-  k.appendChild($(`<div class="k"><div class="n">${S.exchanges.length}</div><div class="l">การแลกทั้งหมด</div></div>`));
-  k.appendChild($(`<div class="k"><div class="n">${S.exchanges.filter(e=>e.state==="Completed").length}</div><div class="l">สำเร็จ</div></div>`));
+  k.appendChild($(`<div class="k"><div class="n">${S.exchanges.filter(e=>e.state==="Completed").length}/${S.exchanges.length}</div><div class="l">แลกสำเร็จ/ทั้งหมด</div></div>`));
   w.appendChild(k);
   const seed=$(`<button class="btn ghost" style="margin:10px 0">🧪 สร้างรายการตัวอย่าง 4 ชิ้น (บัญชีนี้)</button>`); seed.onclick=seedDemo; w.appendChild(seed);
   const t=$(`<div class="card"><label>การแลกล่าสุด</label><table class="tbl"><tr><th>คู่แลก</th><th>สถานะ</th></tr>
     ${S.exchanges.slice(-8).reverse().map(e=>`<tr><td>${esc((S.items.find(x=>x.id===e.aItemId)||{}).title||"?")} ↔ ${esc((S.items.find(x=>x.id===e.bItemId)||{}).title||"?")}</td><td>${STATE_TH[e.state]}</td></tr>`).join("")||`<tr><td colspan=2 class="small">ยังไม่มีข้อมูล</td></tr>`}</table></div>`);
   w.appendChild(t); return w;
 }
-
-/* ---------- FINANCE ---------- */
 function financeView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">💰 การเงิน</h2><div class="sub">ค่าธรรมเนียมและ Royalty (จำลอง)</div>`));
   const completed=S.exchanges.filter(e=>e.state==="Completed");
   const royalty=completed.length*ROYALTY;
-  const deposits=S.exchanges.filter(e=>e.aDeposited).length*DEPOSIT + S.exchanges.filter(e=>e.bDeposited).length*DEPOSIT;
+  const deposits=(S.exchanges.filter(e=>e.aDeposited).length + S.exchanges.filter(e=>e.bDeposited).length)*DEPOSIT;
   const k=$(`<div class="kpi"></div>`);
   k.appendChild($(`<div class="k"><div class="n">${completed.length}</div><div class="l">ธุรกรรมสำเร็จ</div></div>`));
-  k.appendChild($(`<div class="k"><div class="n">฿${royalty.toLocaleString()}</div><div class="l">Royalty→LAKKAN (฿${ROYALTY}/ธุรกรรม)</div></div>`));
-  k.appendChild($(`<div class="k"><div class="n">฿${deposits.toLocaleString()}</div><div class="l">มัดจำหมุนเวียน (จำลอง)</div></div>`));
+  k.appendChild($(`<div class="k"><div class="n">฿${royalty.toLocaleString()}</div><div class="l">Royalty→LAKKAN (฿${ROYALTY}/รายการ)</div></div>`));
+  k.appendChild($(`<div class="k"><div class="n">฿${deposits.toLocaleString()}</div><div class="l">มัดจำหมุนเวียน</div></div>`));
   k.appendChild($(`<div class="k"><div class="n">${S.exchanges.filter(e=>!["Completed","Returned"].includes(e.state)).length}</div><div class="l">กำลังดำเนินการ</div></div>`));
   w.appendChild(k);
   const t=$(`<div class="card"><label>รายการธุรกรรมสำเร็จ</label><table class="tbl"><tr><th>คู่แลก</th><th>Royalty</th></tr>
     ${completed.slice().reverse().map(e=>`<tr><td>${esc((S.items.find(x=>x.id===e.aItemId)||{}).title||"?")} ↔ ${esc((S.items.find(x=>x.id===e.bItemId)||{}).title||"?")}</td><td>฿${ROYALTY}</td></tr>`).join("")||`<tr><td colspan=2 class="small">ยังไม่มีธุรกรรมสำเร็จ</td></tr>`}</table></div>`);
   w.appendChild(t); return w;
 }
-
-/* ---------- COMPANY ---------- */
 function companyView(){
   const w=$(`<div></div>`); w.appendChild($(`<h2 class="title">🏢 บริษัท (KPI)</h2><div class="sub">ตัวชี้วัดสำหรับ Pilot</div>`));
   const total=S.exchanges.length, completed=S.exchanges.filter(e=>e.state==="Completed").length;
   const rate=total?Math.round(completed/total*100):0;
-  const returned=S.exchanges.filter(e=>e.state==="Returned").length;
   const k=$(`<div class="kpi"></div>`);
   k.appendChild($(`<div class="k"><div class="n">${total}</div><div class="l">ธุรกรรมรวม</div></div>`));
   k.appendChild($(`<div class="k"><div class="n">${rate}%</div><div class="l">อัตราสำเร็จ</div></div>`));
   k.appendChild($(`<div class="k"><div class="n">${completed}</div><div class="l">สำเร็จ</div></div>`));
-  k.appendChild($(`<div class="k"><div class="n">${returned}</div><div class="l">ตีกลับ</div></div>`));
+  k.appendChild($(`<div class="k"><div class="n">${S.exchanges.filter(e=>e.state==="Returned").length}</div><div class="l">ตีกลับ</div></div>`));
   w.appendChild(k);
-  w.appendChild($(`<div class="card"><label>เป้าหมาย Pilot</label>
-    <div class="small" style="margin-top:6px">เกณฑ์ผ่าน KPI = ปริมาณธุรกรรม ~3,000/วัน (±10%) ที่เดือนที่ 6 · หน้านี้จะสะสมตัวเลขจริงจากการใช้งาน</div></div>`));
-  w.appendChild($(`<div class="warnbox">การจ่ายเงินและการส่งของในเวอร์ชันนี้เป็น "จำลอง" — ตัวเลขการเงิน/ขนส่งจึงเป็นค่าสาธิต</div>`));
+  w.appendChild($(`<div class="card"><label>เป้าหมาย Pilot</label><div class="small" style="margin-top:6px">เกณฑ์ผ่าน KPI = ปริมาณธุรกรรม ~3,000/วัน (±10%) ที่เดือนที่ 6 · หน้านี้สะสมตัวเลขจริงจากการใช้งาน</div></div>`));
+  w.appendChild($(`<div class="warnbox">การจ่ายเงินและการส่งของในเวอร์ชันนี้เป็น "จำลอง"</div>`));
   return w;
 }
 </script>
