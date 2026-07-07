@@ -83,6 +83,19 @@ label{font-size:12.5px;font-weight:700;color:var(--slate);}
 .small{font-size:11.5px;color:var(--muted);}
 .qrbox{width:104px;height:104px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
 .qrbox img,.qrbox canvas{max-width:100%;height:auto;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(16,42,67,.05);}
+.pcard:active{transform:scale(.98);}
+.pcard .img{position:relative;width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,var(--cream),#e9f2ff);display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden;}
+.pcard .img>img{width:100%;height:100%;object-fit:cover;}
+.pcard .av{position:absolute;left:8px;bottom:8px;width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:#eaf0f6;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+.pcard .av img{width:100%;height:100%;object-fit:cover;}
+.pcard .pv{position:absolute;left:34px;bottom:9px;background:var(--green);color:#fff;font-size:8px;font-weight:800;border-radius:10px;padding:1px 5px;border:1.5px solid #fff;}
+.pcard .info{padding:9px 11px 11px;}
+.pcard .nm{font-weight:700;font-size:13.5px;color:var(--ink);line-height:1.25;height:34px;overflow:hidden;}
+.pcard .pr{color:var(--pink-d);font-weight:800;font-size:14px;margin-top:3px;}
+.pcard .ct{font-size:10.5px;color:var(--muted);margin-top:1px;}
+.pcard.locked{background:#FFF9E6;border-color:#F0D264;}
 .up{border:2px dashed var(--line);border-radius:13px;padding:16px;text-align:center;cursor:pointer;background:#fbfcfe;margin-top:6px;}
 .up img{max-width:100%;border-radius:10px;max-height:150px;}
 .up .ph{font-size:30px;}
@@ -233,7 +246,7 @@ async function seedDemo(){ await guard(async()=>{
 
 /* ---------- QR + Scan + Hub-per-item + Rating ---------- */
 const qrText=(id)=>"LAKKAN:"+id;
-function qrInto(el,text){ el.innerHTML=""; try{ new QRCode(el,{text,width:104,height:104,correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.textContent="(QR)"; } }
+function qrInto(el,text,size){ size=size||104; el.innerHTML=""; try{ new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.textContent="(QR)"; } }
 let scanStream=null;
 function stopScan(){ if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; } const o=document.getElementById("scanModal"); if(o)o.remove(); }
 async function startScan(onCode){
@@ -272,6 +285,24 @@ async function hubValidateItem(raw){
   });
 }
 async function hubReject(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Returned"},"ตรวจไม่ผ่าน ตีกลับ"); await setItemStatus(ex.aItemId,"available"); await setItemStatus(ex.bItemId,"available"); }); }
+function hubHandleScan(raw){
+  const s=(raw||"").trim(); let exId="";
+  if(s.indexOf("LAKKAN:EX:")===0) exId=s.slice(10);
+  else { const iid=s.replace("LAKKAN:","").trim(); const ex0=S.exchanges.find(e=>(e.state==="Deposited"||e.state==="AtHub")&&(e.aItemId===iid||e.bItemId===iid)); if(ex0)exId=ex0.id; }
+  const ex=S.exchanges.find(e=>e.id===exId && (e.state==="Deposited"||e.state==="AtHub"));
+  if(!ex){ alert("ไม่พบคู่แลกที่รอตรวจสำหรับ QR นี้ (ต้องวางมัดจำครบทั้งคู่ก่อน)"); return; }
+  showHubApprove(ex);
+}
+function showHubApprove(ex){
+  const ai=S.items.find(x=>x.id===ex.aItemId),bi=S.items.find(x=>x.id===ex.bItemId);
+  const m=$(`<div id="scanModal" style="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px"></div>`);
+  const card=$(`<div class="card" style="max-width:400px;width:100%;margin:0"><h2 class="title">ตรวจสอบคู่แลก (สแกนแล้ว)</h2><div class="sub">เทียบของจริงกับข้อมูลทั้งสองชิ้น แล้วอนุมัติ</div></div>`);
+  [[ai,ex.aName],[bi,ex.bName]].forEach(([it,nm])=>{ card.appendChild($(`<div class="item" style="margin:8px 0"><div class="thumb">${it&&it.photo?`<img src="${it.photo}">`:(CATICON[it&&it.category]||"📦")}</div><div style="flex:1"><div class="t">${esc(it&&it.title||"?")}</div><div class="m">${esc(it&&it.category||"")} · ~${it&&it.estValue||0}฿ · ${esc(nm)}</div></div></div>`)); });
+  const ok=$(`<button class="btn green" style="margin-top:10px">✓ อนุมัติทั้งคู่ (รับเข้าฮับ + ตรวจผ่าน)</button>`); ok.onclick=()=>{ stopScan(); hubApprovePair(ex); };
+  const cancel=$(`<button class="btn ghost" style="margin-top:8px">ปิด</button>`); cancel.onclick=stopScan;
+  card.append(ok,cancel); m.appendChild(card); document.body.appendChild(m);
+}
+async function hubApprovePair(ex){ await guard(async()=>{ await exUpdate(ex,{state:"Validated",aValidated:true,bValidated:true},"สแกน QR คู่ — รับ+ตรวจผ่านทั้งคู่"); }); }
 async function rateExchange(ex,side,stars,comment){ await guard(async()=>{ await updateDoc(doc(db,"exchanges",ex.id),{[side]:stars,[side+"Comment"]:comment||""}); alert("ขอบคุณสำหรับคะแนน ⭐"); }); }
 function myRatingAvg(){ let sum=0,n=0; S.exchanges.forEach(e=>{ if(e.aUid===S.user.uid && e.rateB>0){sum+=e.rateB;n++;} if(e.bUid===S.user.uid && e.rateA>0){sum+=e.rateA;n++;} }); return n?(sum/n).toFixed(1):"—"; }
 function toast(msg,exId){ const t=$(`<div style="position:fixed;top:14px;left:50%;transform:translateX(-50%);max-width:410px;width:92%;background:var(--navy);color:#fff;padding:12px 14px;border-radius:12px;z-index:200;box-shadow:0 8px 28px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;font-size:13.5px"></div>`);
@@ -439,6 +470,14 @@ function itemCard(i,onclick){
   if(i.status==='locked'){ c.style.background='#FFF9E6'; c.style.borderColor='#F0D264'; }
   if(onclick){ c.onclick=onclick; c.style.cursor="pointer"; } return c;
 }
+function productCard(i){
+  const ow=S.users[i.ownerUid]||{}; const av=ow.kyc&&ow.kyc.selfie; const vr=ow.kyc&&ow.kyc.status==="verified";
+  const c=$(`<div class="pcard ${i.status==='locked'?'locked':''}">
+    <div class="img">${i.photo?`<img src="${i.photo}">`:(CATICON[i.category]||"📦")}<div class="av">${av?`<img src="${av}">`:"👤"}</div>${vr?'<span class="pv">✓</span>':''}</div>
+    <div class="info"><div class="nm">${esc(i.title)}</div><div class="pr">~฿${(i.estValue||0).toLocaleString()}</div>
+    <div class="ct">${esc(i.category)} · ${esc((i.ownerName||"").split(" ")[0])}${i.status==='locked'?' · กำลังแลก':''}</div></div></div>`);
+  c.onclick=()=>{S.sel=i.id;S.view="itemDetail";render();}; return c;
+}
 function feed(){
   const w=$(`<div></div>`);
   w.appendChild($(`<h2 class="title">ค้นหาของเพื่อแลก</h2><div class="sub">ของที่วางเฉย = ฿0 · แลกเป็นของที่คุณอยากได้ จ่ายแค่ค่าส่ง</div>`));
@@ -448,7 +487,7 @@ function feed(){
   const ab=$(`<button class="btn blue sm">จับคู่</button>`); ab.onclick=()=>{S.view="ai";S.ai=null;render();}; ai.appendChild(ab); w.appendChild(ai);
   const list=availOthers();
   if(!list.length) w.appendChild($(`<div class="hint">ยังไม่มีของจากคนอื่น — ชวนเพื่อนสมัครและลงของ หรือไปที่โมดูล 📊 แอดมิน กด "สร้างรายการตัวอย่าง"</div>`));
-  list.forEach(i=>w.appendChild(itemCard(i,()=>{S.sel=i.id;S.view="itemDetail";render();})));
+  else { const grid=$(`<div class="grid"></div>`); list.forEach(i=>grid.appendChild(productCard(i))); w.appendChild(grid); }
   return w;
 }
 function itemDetailView(){
@@ -547,14 +586,10 @@ function exDetailView(){
   if(e.state==="Completed"){ act.appendChild($(`<span class="pill p-ok">แลกสำเร็จ 🎉</span>`)); has=true; }
   if(e.state==="Returned"){ act.appendChild($(`<span class="pill p-warn">รายการถูกตีกลับ/ยกเลิก</span>`)); has=true; }
   if(has) w.appendChild(act);
-  // QR สำหรับติดพัสดุ (ให้ฮับสแกนอนุมัติทีละชิ้น)
+  // QR คู่แลก 1 โค้ด (ติดได้ทั้งสองพัสดุ) — ฮับสแกนครั้งเดียวเห็นทั้งคู่
   if(["Proposed","Accepted","Deposited","AtHub","Validated","Locked"].includes(e.state)){
-    const qc=$(`<div class="card"><label>QR ติดพัสดุ — ให้ฮับสแกนอนุมัติทีละชิ้น</label><div class="row" style="justify-content:space-around;margin-top:10px"></div></div>`);
-    const qr=qc.querySelector(".row");
-    [[esc(ai?.title||"?"),e.aItemId],[esc(bi?.title||"?"),e.bItemId]].forEach(([lab,id])=>{
-      const bx=$(`<div style="text-align:center"><div class="qrbox"></div><div class="small" style="margin-top:4px">${lab}</div><div class="small" style="font-size:9px">${esc(id)}</div></div>`);
-      qr.appendChild(bx); qrInto(bx.querySelector(".qrbox"),qrText(id)); });
-    w.appendChild(qc);
+    const qc=$(`<div class="card" style="text-align:center"><label>QR คู่แลก — ติดได้ทั้งสองพัสดุ (ฮับสแกน 1 ครั้ง เห็นทั้งคู่)</label><div class="qrbox" style="width:150px;height:150px;margin:12px auto"></div><div class="small">รหัสคู่: EX:${esc(e.id)}</div></div>`);
+    qrInto(qc.querySelector(".qrbox"),"LAKKAN:EX:"+e.id,140); w.appendChild(qc);
   }
   // ให้คะแนนเมื่อสำเร็จ
   if(e.state==="Completed" && (isA||isB)){
@@ -633,8 +668,9 @@ function hubView(){
   q.forEach(e=>{ const ai=S.items.find(x=>x.id===e.aItemId),bi=S.items.find(x=>x.id===e.bItemId);
     const c=$(`<div class="card"><div class="row"><div style="flex:1"><b>${esc(ai?.title||"?")}</b> ↔ <b>${esc(bi?.title||"?")}</b></div><span class="pill p-blue">${STATE_TH[e.state]}</span></div>${stateFlow(e.state)}</div>`);
     if(e.state==="Deposited"||e.state==="AtHub"){
-      c.appendChild($(`<div class="small" style="margin-top:8px">สแกน QR เพื่อ <b>รับ + ตรวจ</b> ของเข้าฮับ (ทีละชิ้น)<br>${e.aValidated?"✅":"⬜"} ${esc(ai?.title||"?")} ${e.aValidated?"(อนุมัติแล้ว)":"(รอสแกน)"}<br>${e.bValidated?"✅":"⬜"} ${esc(bi?.title||"?")} ${e.bValidated?"(อนุมัติแล้ว)":"(รอสแกน)"}</div>`));
-      const sc=$(`<button class="btn navy sm" style="margin-top:8px">📷 สแกน QR รับ + อนุมัติสินค้า</button>`); sc.onclick=()=>startScan(hubValidateItem); c.appendChild(sc);
+      c.appendChild($(`<div class="small" style="margin-top:8px">สแกน QR คู่แลก เพื่อ <b>รับ + ตรวจ</b> ของเข้าฮับ (สแกน 1 ครั้ง เห็นทั้งคู่)</div>`));
+      const sc=$(`<button class="btn navy sm" style="margin-top:8px">📷 สแกน QR คู่</button>`); sc.onclick=()=>startScan(hubHandleScan); c.appendChild(sc);
+      const sim=$(`<button class="btn blue sm" style="margin-top:6px">🧪 จำลองสแกน (เดโม ไม่ใช้กล้อง)</button>`); sim.onclick=()=>hubHandleScan("LAKKAN:EX:"+e.id); c.appendChild(sim);
       const rj=$(`<button class="btn red sm" style="margin-top:6px">✕ ตรวจไม่ผ่าน / ตีกลับ</button>`); rj.onclick=()=>{ if(confirm("ตีกลับทั้งรายการ?")) hubReject(e); }; c.appendChild(rj); }
     if(e.state==="Validated"){ const b=$(`<button class="btn pink sm" style="margin-top:6px">🔒 ล็อก & ปล่อยไขว้พร้อมกัน</button>`); b.onclick=()=>hubLock(e); c.appendChild(b); }
     if(e.state==="Locked"){ const b=$(`<button class="btn blue sm" style="margin-top:6px">🚚 จำลองจัดส่งออกจากฮับ</button>`); b.onclick=()=>hubShip(e); c.appendChild(b); }
